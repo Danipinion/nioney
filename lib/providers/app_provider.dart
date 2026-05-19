@@ -14,10 +14,13 @@ class AppProvider with ChangeNotifier {
   static const String _prefThemeModeKey = 'nioney_theme_mode';
   static const String _prefPaletteKey = 'nioney_palette';
   static const String _prefCurrencyKey = 'nioney_currency';
+  static const String _prefCategoriesKey = 'nioney_categories';
+  static const String _prefSubCategoriesKey = 'nioney_subcategories';
 
   final _uuid = const Uuid();
 
-  List<Category> _categories = Category.defaultCategories;
+  List<Category> _categories = [];
+  Map<String, List<String>> _subCategories = {};
   List<Wallet> _wallets = [];
   List<Transaction> _transactions = [];
   List<Budget> _budgets = [];
@@ -28,6 +31,7 @@ class AppProvider with ChangeNotifier {
 
   // Getters
   List<Category> get categories => _categories;
+  Map<String, List<String>> get subCategories => _subCategories;
   List<Wallet> get wallets => _wallets;
   List<Transaction> get transactions => _transactions;
   List<Budget> get budgets => _budgets;
@@ -35,13 +39,92 @@ class AppProvider with ChangeNotifier {
   String get currentPalette => _currentPalette;
   String get currencySymbol => _currencySymbol;
 
+  List<String> getSubCategoriesForCategory(String categoryId) {
+    return _subCategories[categoryId] ?? [];
+  }
+
   AppProvider() {
     _loadData();
+  }
+
+  List<Category> _getDefaultCategoriesList() {
+    return [
+      const Category(id: 'food', name: 'Makanan & Minuman', icon: Icons.fastfood_rounded, color: Color(0xFFFF7043), isExpense: true),
+      const Category(id: 'transport', name: 'Transportasi', icon: Icons.directions_car_rounded, color: Color(0xFF42A5F5), isExpense: true),
+      const Category(id: 'shopping', name: 'Belanja', icon: Icons.shopping_bag_rounded, color: Color(0xFFEC407A), isExpense: true),
+      const Category(id: 'bills', name: 'Tempat Tinggal', icon: Icons.home_rounded, color: Color(0xFFFFCA28), isExpense: true),
+      const Category(id: 'entertainment', name: 'Hiburan', icon: Icons.movie_creation_rounded, color: Color(0xFFAB47BC), isExpense: true),
+      const Category(id: 'health', name: 'Kesehatan', icon: Icons.healing_rounded, color: Color(0xFF26A69A), isExpense: true),
+      const Category(id: 'education', name: 'Pendidikan', icon: Icons.school_rounded, color: Color(0xFF8D6E63), isExpense: true),
+      const Category(id: 'personal', name: 'Pribadi', icon: Icons.person_rounded, color: Color(0xFFBA68C8), isExpense: true),
+      const Category(id: 'financial', name: 'Keuangan', icon: Icons.payments_rounded, color: Color(0xFF64748B), isExpense: true),
+      const Category(id: 'social', name: 'Teman', icon: Icons.group_rounded, color: Color(0xFF26C6DA), isExpense: true),
+      const Category(id: 'salary', name: 'Gaji', icon: Icons.account_balance_wallet_rounded, color: Color(0xFF66BB6A), isExpense: false),
+      const Category(id: 'investment', name: 'Investasi', icon: Icons.trending_up_rounded, color: Color(0xFF26C6DA), isExpense: false),
+      const Category(id: 'other_income', name: 'Pemasukan Lain', icon: Icons.savings_rounded, color: Color(0xFF78909C), isExpense: false),
+      const Category(id: 'other_expense', name: 'Lain-lain', icon: Icons.more_horiz_rounded, color: Color(0xFF8D6E63), isExpense: true),
+    ];
+  }
+
+  Map<String, List<String>> _getDefaultSubCategories() {
+    return {
+      'food': ['Sarapan', 'Makan Siang', 'Makan Malam', 'Tempat Makan', 'Camilan', 'Minuman', 'Sembako', 'Pesan Antar', 'Alkohol', 'Buah', 'Kopi', 'Jajanan'],
+      'transport': ['Bus', 'Kereta', 'Taksi', 'Bensin', 'Parkir', 'Perawatan', 'Asuransi', 'Tol', 'Ojek Online', 'Pesawat'],
+      'shopping': ['Pakaian', 'Elektronik', 'Rumah', 'Kecantikan', 'Hadiah', 'Perangkat Lunak', 'Peralatan', 'Sepatu', 'Online', 'Perawatan'],
+      'bills': ['Sewa', 'KPR', 'Tagihan', 'Internet', 'Perawatan', 'Perabotan', 'Jasa', 'Laundry', 'Pulsa & Data', 'Listrik'],
+      'entertainment': ['Bioskop', 'Game', 'Streaming', 'Acara', 'Hobi', 'Perjalanan', 'Musik'],
+      'health': ['Dokter', 'Apotik', 'Gym', 'Asuransi', 'Kesehatan Mental', 'Olahraga'],
+      'education': ['SPP', 'Buku', 'Kursus', 'Perlengkapan', 'Alat Tulis'],
+      'personal': ['Potong Rambut', 'Spa', 'Kosmetik'],
+      'financial': ['Pajak', 'Biaya Admin', 'Denda', 'Asuransi', 'Donasi/Sedekah', 'Zakat'],
+      'social': ['Transfer', 'Traktir', 'Refund', 'Loan', 'Gift'],
+      'salary': ['Gaji Pokok', 'Bonus', 'THR', 'Uang Lembur', 'Komisi'],
+      'investment': ['Saham', 'Reksadana', 'Emas', 'Kripto', 'Obligasi'],
+      'other_income': ['Cashback', 'Hadiah', 'Penjualan Barang', 'Bunga Bank', 'Lain-lain'],
+      'other_expense': ['Donasi', 'Zakat', 'Biaya Admin', 'Denda', 'Kehilangan', 'Lain-lain'],
+    };
   }
 
   // Load persistent data from SharedPreferences or set defaults
   Future<void> _loadData() async {
     final prefs = await SharedPreferences.getInstance();
+
+    // Load Categories
+    final categoriesJson = prefs.getString(_prefCategoriesKey);
+    bool needsForceDefaults = false;
+    if (categoriesJson != null) {
+      try {
+        final List<dynamic> decoded = jsonDecode(categoriesJson);
+        _categories = decoded.map((c) => _categoryFromJson(c)).toList();
+        if (!_categories.any((c) => c.id == 'social') || !_categories.any((c) => c.id == 'financial')) {
+          needsForceDefaults = true;
+        }
+      } catch (e) {
+        needsForceDefaults = true;
+      }
+    } else {
+      needsForceDefaults = true;
+    }
+
+    if (needsForceDefaults) {
+      _categories = _getDefaultCategoriesList();
+      _subCategories = _getDefaultSubCategories();
+      await _saveCategories();
+      await _saveSubCategories();
+    } else {
+      // Load Subcategories
+      final subJson = prefs.getString(_prefSubCategoriesKey);
+      if (subJson != null) {
+        try {
+          final Map<String, dynamic> decoded = jsonDecode(subJson);
+          _subCategories = decoded.map((key, value) => MapEntry(key, List<String>.from(value)));
+        } catch (e) {
+          _subCategories = _getDefaultSubCategories();
+        }
+      } else {
+        _subCategories = _getDefaultSubCategories();
+      }
+    }
 
     // 1. Load Theme Mode
     final themeStr = prefs.getString(_prefThemeModeKey);
@@ -516,5 +599,82 @@ class AppProvider with ChangeNotifier {
       ),
       const Budget(id: 'budget_3', categoryId: 'bills', limitAmount: 1000000.0),
     ];
+  }
+
+  Future<void> addCategory({
+    required String name,
+    required IconData icon,
+    required Color color,
+    required bool isExpense,
+  }) async {
+    final newId = _uuid.v4();
+    final cat = Category(
+      id: newId,
+      name: name,
+      icon: icon,
+      color: color,
+      isExpense: isExpense,
+    );
+    _categories.add(cat);
+    _subCategories[newId] = [];
+    await _saveCategories();
+    await _saveSubCategories();
+    notifyListeners();
+  }
+
+  Future<void> deleteCategory(String id) async {
+    _categories.removeWhere((c) => c.id == id);
+    _subCategories.remove(id);
+    await _saveCategories();
+    await _saveSubCategories();
+    notifyListeners();
+  }
+
+  Future<void> addSubCategory(String categoryId, String name) async {
+    if (_subCategories[categoryId] == null) {
+      _subCategories[categoryId] = [];
+    }
+    _subCategories[categoryId]!.add(name);
+    await _saveSubCategories();
+    notifyListeners();
+  }
+
+  Future<void> deleteSubCategory(String categoryId, String name) async {
+    if (_subCategories[categoryId] != null) {
+      _subCategories[categoryId]!.remove(name);
+      await _saveSubCategories();
+      notifyListeners();
+    }
+  }
+
+  Future<void> _saveCategories() async {
+    final prefs = await SharedPreferences.getInstance();
+    final encoded = _categories.map((c) => _categoryToJson(c)).toList();
+    await prefs.setString(_prefCategoriesKey, jsonEncode(encoded));
+  }
+
+  Future<void> _saveSubCategories() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_prefSubCategoriesKey, jsonEncode(_subCategories));
+  }
+
+  Category _categoryFromJson(Map<String, dynamic> json) {
+    return Category(
+      id: json['id'],
+      name: json['name'],
+      icon: IconData(json['icon'], fontFamily: 'MaterialIcons'),
+      color: Color(json['color']),
+      isExpense: json['isExpense'] ?? true,
+    );
+  }
+
+  Map<String, dynamic> _categoryToJson(Category c) {
+    return {
+      'id': c.id,
+      'name': c.name,
+      'icon': c.icon.codePoint,
+      'color': c.color.value,
+      'isExpense': c.isExpense,
+    };
   }
 }

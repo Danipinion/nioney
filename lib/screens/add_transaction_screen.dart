@@ -566,45 +566,16 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     return '$monthStr $dayStr\n$timeStr';
   }
 
-  List<Map<String, dynamic>> _getSubCategories(String categoryName) {
-    final name = categoryName.toLowerCase();
-    if (name.contains('makan') || name.contains('minum') || name.contains('food') || name.contains('culinary')) {
-      return [
-        {'name': 'Sarapan', 'icon': Icons.wb_sunny_outlined},
-        {'name': 'Makan Siang', 'icon': Icons.lunch_dining_outlined},
-        {'name': 'Makan Malam', 'icon': Icons.dinner_dining_outlined},
-      ];
-    } else if (name.contains('trans') || name.contains('travel') || name.contains('ojek')) {
-      return [
-        {'name': 'Bensin', 'icon': Icons.local_gas_station_rounded},
-        {'name': 'Parkir', 'icon': Icons.local_parking_rounded},
-        {'name': 'Ojek Online', 'icon': Icons.motorcycle_rounded},
-      ];
-    } else if (name.contains('belanja') || name.contains('shop')) {
-      return [
-        {'name': 'Baju', 'icon': Icons.checkroom_rounded},
-        {'name': 'Bulanan', 'icon': Icons.shopping_basket_rounded},
-        {'name': 'Skincare', 'icon': Icons.face_rounded},
-      ];
-    } else if (name.contains('hibur') || name.contains('play') || name.contains('game')) {
-      return [
-        {'name': 'Bioskop', 'icon': Icons.movie_outlined},
-        {'name': 'Game', 'icon': Icons.sports_esports_outlined},
-        {'name': 'Streaming', 'icon': Icons.tv_rounded},
-      ];
-    } else if (name.contains('tinggal') || name.contains('rumah') || name.contains('home')) {
-      return [
-        {'name': 'Listrik', 'icon': Icons.bolt_rounded},
-        {'name': 'Air', 'icon': Icons.water_drop_rounded},
-        {'name': 'Kebutuhan', 'icon': Icons.home_rounded},
-      ];
-    } else {
+  List<Map<String, dynamic>> _getSubCategories(AppProvider provider, String categoryId) {
+    final subList = provider.getSubCategoriesForCategory(categoryId);
+    if (subList.isEmpty) {
       return [
         {'name': 'Umum', 'icon': Icons.payments_outlined},
         {'name': 'Pribadi', 'icon': Icons.person_outline_rounded},
         {'name': 'Lain-lain', 'icon': Icons.more_horiz_rounded},
       ];
     }
+    return subList.map((name) => {'name': name, 'icon': Icons.circle_outlined}).toList();
   }
 
   Widget _buildKey({
@@ -741,7 +712,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       orElse: () => filteredCategories.isNotEmpty ? filteredCategories.first : filteredCategories[0],
     );
 
-    final subCategories = _getSubCategories(activeMainCategory.name);
+    final subCategories = _getSubCategories(provider, activeMainCategory.id);
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.95,

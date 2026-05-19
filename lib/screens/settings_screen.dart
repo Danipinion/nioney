@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/app_provider.dart';
 import '../theme/app_theme.dart';
+import 'categories_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -388,7 +389,7 @@ class SettingsScreen extends StatelessWidget {
                       ),
                       onTap: () => _showCurrencyPicker(context, provider),
                     ),
-                    Divider(color: borderColor, height: 1, indent: 56),
+                     Divider(color: borderColor, height: 1, indent: 56),
                     // Theme toggler (Information block)
                     ListTile(
                       leading: Icon(
@@ -417,6 +418,39 @@ class SettingsScreen extends StatelessWidget {
                           );
                         },
                       ),
+                    ),
+                    Divider(color: borderColor, height: 1, indent: 56),
+                    // Kelola Kategori
+                    ListTile(
+                      leading: Icon(
+                        Icons.category_rounded,
+                        color: theme.primaryColor,
+                        size: 20,
+                      ),
+                      title: Text(
+                        'Kelola Kategori',
+                        style: TextStyle(
+                          color: mainTextColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      subtitle: Text(
+                        'Atur kategori pemasukan, pengeluaran & sistem.',
+                        style: TextStyle(color: subTextColor, fontSize: 11),
+                      ),
+                      trailing: Icon(
+                        Icons.keyboard_arrow_right_rounded,
+                        color: subTextColor,
+                        size: 20,
+                      ),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const CategoriesScreen(),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
