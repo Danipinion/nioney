@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../models/transaction.dart';
 import '../models/category.dart';
 import '../models/wallet.dart';
+import '../main.dart';
 
 class TransactionItem extends StatelessWidget {
   final Transaction transaction;
@@ -37,11 +38,16 @@ class TransactionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final numberFormat = NumberFormat.currency(
-      locale: 'id_ID',
-      symbol: '',
-      decimalDigits: 0,
-    );
+    final numberFormat = AppLocale.isInitialized
+        ? NumberFormat.currency(
+            locale: 'id_ID',
+            symbol: '',
+            decimalDigits: 0,
+          )
+        : NumberFormat.currency(
+            symbol: '',
+            decimalDigits: 0,
+          );
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final mainTextColor = isDark ? Colors.white : const Color(0xFF0F172A);

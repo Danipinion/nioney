@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../providers/app_provider.dart';
 import '../models/category.dart';
+import '../main.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
@@ -37,11 +38,16 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final breakdown = provider.getCategorySpendingBreakdown();
     final totalExpense = provider.monthlyExpense;
 
-    final numberFormat = NumberFormat.currency(
-      locale: 'id_ID',
-      symbol: '$currency ',
-      decimalDigits: 0,
-    );
+    final numberFormat = AppLocale.isInitialized
+        ? NumberFormat.currency(
+            locale: 'id_ID',
+            symbol: '$currency ',
+            decimalDigits: 0,
+          )
+        : NumberFormat.currency(
+            symbol: '$currency ',
+            decimalDigits: 0,
+          );
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,

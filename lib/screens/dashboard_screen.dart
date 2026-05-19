@@ -6,6 +6,16 @@ import '../models/wallet.dart';
 import '../widgets/transaction_item.dart';
 import 'add_transaction_screen.dart';
 import 'budgets_screen.dart';
+import 'recurring_screen.dart';
+import 'savings_targets_screen.dart';
+import 'bills_screen.dart';
+import 'debts_screen.dart';
+import 'wishlist_screen.dart';
+import 'cards_screen.dart';
+import 'notes_screen.dart';
+import 'reimburse_screen.dart';
+import 'assets_screen.dart';
+import '../main.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -38,11 +48,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
         : Colors.black.withValues(alpha: 0.03);
 
     // Number format config
-    final numberFormat = NumberFormat.currency(
-      locale: 'id_ID',
-      symbol: '$currency ',
-      decimalDigits: 0,
-    );
+    final numberFormat = AppLocale.isInitialized
+        ? NumberFormat.currency(
+            locale: 'id_ID',
+            symbol: '$currency ',
+            decimalDigits: 0,
+          )
+        : NumberFormat.currency(
+            symbol: '$currency ',
+            decimalDigits: 0,
+          );
 
     // Dynamic Filter calculations based on _selectedTab
     final now = DateTime.now();
@@ -500,7 +515,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       'Berulang',
                       const Color(0xFFE3F2FD),
                       const Color(0xFF42A5F5),
-                      () {},
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RecurringScreen(),
+                          ),
+                        );
+                      },
                       subTextColor,
                     ),
                     _buildMenuItem(
@@ -509,7 +531,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       'Target',
                       const Color(0xFFE8F5E9),
                       const Color(0xFF66BB6A),
-                      () {},
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SavingsTargetsScreen(),
+                          ),
+                        );
+                      },
                       subTextColor,
                     ),
                     _buildMenuItem(
@@ -518,7 +547,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       'Tagihan',
                       const Color(0xFFFFEBEE),
                       const Color(0xFFEF5350),
-                      () {},
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const BillsScreen(),
+                          ),
+                        );
+                      },
                       subTextColor,
                     ),
                     _buildMenuItem(
@@ -527,7 +563,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       'Utang',
                       const Color(0xFFF3E5F5),
                       const Color(0xFFAB47BC),
-                      () {},
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const DebtsScreen(),
+                          ),
+                        );
+                      },
                       subTextColor,
                     ),
                     _buildMenuItem(
@@ -536,7 +579,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       'Keinginan',
                       const Color(0xFFFFF8E1),
                       const Color(0xFFFFB300),
-                      () {},
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const WishlistScreen(),
+                          ),
+                        );
+                      },
                       subTextColor,
                     ),
                     _buildMenuItem(
@@ -545,7 +595,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       'Kartu',
                       const Color(0xFFE0F7FA),
                       const Color(0xFF00ACC1),
-                      () {},
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CardsScreen(),
+                          ),
+                        );
+                      },
                       subTextColor,
                     ),
                     _buildMenuItem(
@@ -554,7 +611,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       'Catatan',
                       const Color(0xFFEFEBE9),
                       const Color(0xFF8D6E63),
-                      () {},
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const NotesScreen(),
+                          ),
+                        );
+                      },
                       subTextColor,
                     ),
                     _buildMenuItem(
@@ -563,7 +627,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       'Reimburse',
                       const Color(0xFFF1F8E9),
                       const Color(0xFF7CB342),
-                      () {},
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ReimburseScreen(),
+                          ),
+                        );
+                      },
                       subTextColor,
                     ),
                     _buildMenuItem(
@@ -572,7 +643,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       'Aset',
                       const Color(0xFFECEFF1),
                       const Color(0xFF607D8B),
-                      () {},
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AssetsScreen(),
+                          ),
+                        );
+                      },
                       subTextColor,
                     ),
                   ],
@@ -580,58 +658,170 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               const SizedBox(height: 24),
 
-              // 5. "Anggaran Bulanan" Box
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: cardBgColor,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: borderColor),
-                  boxShadow: [
-                    BoxShadow(
-                      color: shadowColor,
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Anggaran Bulanan',
-                      style: TextStyle(
-                        color: mainTextColor,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
+              // 5. "Anggaran Bulanan" Box (Dynamic Total Only!)
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const BudgetsScreen()),
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: cardBgColor,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: borderColor),
+                    boxShadow: [
+                      BoxShadow(
+                        color: shadowColor,
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.add_circle_outline_rounded,
-                          color: subTextColor.withValues(alpha: 0.6),
-                          size: 20,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'Belum ada anggaran. Ketuk untuk membuat!',
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Anggaran Bulanan',
                             style: TextStyle(
-                              color: subTextColor.withValues(alpha: 0.7),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
+                              color: mainTextColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          Icon(
+                            Icons.chevron_right_rounded,
+                            color: subTextColor,
+                            size: 18,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      provider.budgets.isEmpty
+                          ? Row(
+                              children: [
+                                Icon(
+                                  Icons.add_circle_outline_rounded,
+                                  color: subTextColor.withValues(alpha: 0.6),
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    'Belum ada anggaran. Ketuk untuk membuat!',
+                                    style: TextStyle(
+                                      color: subTextColor.withValues(alpha: 0.7),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : () {
+                              // Compute global aggregated budget details
+                              final double totalLimit = provider.budgets.fold(0.0, (sum, b) => sum + b.limitAmount);
+                              double totalSpent = 0.0;
+                              for (var budget in provider.budgets) {
+                                totalSpent += provider.getSpentForCategory(budget.categoryId);
+                              }
+                              final double remaining = totalLimit - totalSpent;
+                              final double progress = totalLimit > 0 ? (totalSpent / totalLimit).clamp(0.0, 1.0) : 0.0;
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(6),
+                                            decoration: const BoxDecoration(
+                                              color: Color(0xFFFFECE2), // pastel orange
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.track_changes_rounded,
+                                              color: Color(0xFFFF7043),
+                                              size: 14,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'Total Anggaran',
+                                            style: TextStyle(
+                                              color: mainTextColor,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Text(
+                                        'Sisa ${numberFormat.format(remaining < 0 ? 0.0 : remaining)}',
+                                        style: TextStyle(
+                                          color: remaining < 0 ? const Color(0xFFEF5350) : const Color(0xFF00D179),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w800,
+                                          fontFamily: 'Outfit',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Terpakai ${(progress * 100).toStringAsFixed(0)}%',
+                                        style: TextStyle(
+                                          color: subTextColor,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${numberFormat.format(totalSpent)} / ${numberFormat.format(totalLimit)}',
+                                        style: TextStyle(
+                                          color: subTextColor,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          fontFamily: 'Outfit',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(6),
+                                    child: LinearProgressIndicator(
+                                      value: progress,
+                                      backgroundColor: isDark
+                                          ? Colors.white.withValues(alpha: 0.04)
+                                          : Colors.black.withValues(alpha: 0.04),
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        remaining < 0
+                                            ? const Color(0xFFEF5350)
+                                            : const Color(0xFF00D179), // beautiful premium green progress color
+                                      ),
+                                      minHeight: 8,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }(),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 24),
 
               // 6. "Rekam Cepat" Section
               Text(

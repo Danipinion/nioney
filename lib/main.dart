@@ -1,12 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'providers/app_provider.dart';
 import 'theme/app_theme.dart';
 import 'screens/home_navigation.dart';
 
-void main() {
+class AppLocale {
+  static bool isInitialized = false;
+
+  // 100% safe, crash-free currency formatting that works everywhere (even in debug F5)
+  static String formatCurrency(double amount, String symbol) {
+    try {
+      final formatter = NumberFormat.currency(
+        symbol: symbol,
+        decimalDigits: 0,
+      );
+      final raw = formatter.format(amount);
+      return raw.replaceAll(',', '.');
+    } catch (_) {
+      return '$symbol${amount.toStringAsFixed(0)}';
+    }
+  }
+}
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize date formatting for id_ID locale
+  try {
+    await initializeDateFormatting('id_ID', null);
+    AppLocale.isInitialized = true;
+  } catch (_) {
+    AppLocale.isInitialized = false;
+  }
 
   // Set system UI overlay styling for a premium fullscreen dark look
   SystemChrome.setSystemUIOverlayStyle(

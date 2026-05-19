@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/wallet.dart';
+import '../main.dart';
 
 class WalletCard extends StatelessWidget {
   final Wallet wallet;
@@ -16,11 +17,16 @@ class WalletCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final numberFormat = NumberFormat.currency(
-      locale: 'id_ID',
-      symbol: '$currencySymbol ',
-      decimalDigits: 0,
-    );
+    final numberFormat = AppLocale.isInitialized
+        ? NumberFormat.currency(
+            locale: 'id_ID',
+            symbol: '$currencySymbol ',
+            decimalDigits: 0,
+          )
+        : NumberFormat.currency(
+            symbol: '$currencySymbol ',
+            decimalDigits: 0,
+          );
 
     final isNegative = wallet.balance < 0;
 
