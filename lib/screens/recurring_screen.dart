@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_provider.dart';
 import '../models/category.dart';
@@ -14,6 +15,126 @@ class RecurringScreen extends StatefulWidget {
 class _RecurringScreenState extends State<RecurringScreen> {
   DateTime _selectedDate = DateTime(2026, 5, 19);
   DateTime _currentMonth = DateTime(2026, 5, 1);
+
+  void _showCupertinoDatePicker({
+    required BuildContext context,
+    required DateTime initialDate,
+    required DateTime firstDate,
+    required DateTime lastDate,
+    required ValueChanged<DateTime> onDateSelected,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final headerBgColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final pickerBgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    
+    DateTime tempPickedDate = initialDate;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setPickerState) {
+            return Container(
+              decoration: BoxDecoration(
+                color: pickerBgColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: headerBgColor,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                        topRight: Radius.circular(24),
+                      ),
+                      border: Border(
+                        bottom: BorderSide(
+                          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: const Text(
+                            'Batal',
+                            style: TextStyle(
+                              color: Colors.blueAccent,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          tempPickedDate.year.toString(),
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            fontFamily: 'Outfit',
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            onDateSelected(tempPickedDate);
+                            Navigator.pop(context);
+                          },
+                          child: const Text(
+                            'Selesai',
+                            style: TextStyle(
+                              color: Colors.blueAccent,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 240,
+                    child: CupertinoTheme(
+                      data: CupertinoThemeData(
+                        brightness: isDark ? Brightness.dark : Brightness.light,
+                        textTheme: CupertinoTextThemeData(
+                          dateTimePickerTextStyle: TextStyle(
+                            color: textColor,
+                            fontSize: 16,
+                            fontFamily: 'Outfit',
+                          ),
+                        ),
+                      ),
+                      child: CupertinoDatePicker(
+                        mode: CupertinoDatePickerMode.date,
+                        initialDateTime: initialDate,
+                        minimumDate: firstDate,
+                        maximumDate: lastDate,
+                        onDateTimeChanged: (DateTime newDate) {
+                          setPickerState(() {
+                            tempPickedDate = newDate;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+        );
+      },
+    );
+  }
 
   // Dynamic interactive recurring items
   final List<Map<String, dynamic>> _recurringItems = [
@@ -585,18 +706,18 @@ class _RecurringScreenState extends State<RecurringScreen> {
                                 ),
                                 const SizedBox(height: 8),
                                 GestureDetector(
-                                  onTap: () async {
-                                    final picked = await showDatePicker(
+                                  onTap: () {
+                                    _showCupertinoDatePicker(
                                       context: context,
                                       initialDate: startDate,
                                       firstDate: DateTime(2020),
-                                      lastDate: DateTime(2030),
+                                      lastDate: DateTime(2035),
+                                      onDateSelected: (newDate) {
+                                        setPageState(() {
+                                          startDate = newDate;
+                                        });
+                                      },
                                     );
-                                    if (picked != null) {
-                                      setPageState(() {
-                                        startDate = picked;
-                                      });
-                                    }
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -627,18 +748,18 @@ class _RecurringScreenState extends State<RecurringScreen> {
                       ),
                       const SizedBox(height: 8),
                       GestureDetector(
-                        onTap: () async {
-                          final picked = await showDatePicker(
+                        onTap: () {
+                          _showCupertinoDatePicker(
                             context: context,
                             initialDate: endDate ?? startDate.add(const Duration(days: 30)),
                             firstDate: startDate,
                             lastDate: DateTime(2035),
+                            onDateSelected: (newDate) {
+                              setPageState(() {
+                                endDate = newDate;
+                              });
+                            },
                           );
-                          if (picked != null) {
-                            setPageState(() {
-                              endDate = picked;
-                            });
-                          }
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

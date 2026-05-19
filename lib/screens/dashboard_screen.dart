@@ -823,49 +823,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
 
-              // 6. "Rekam Cepat" Section
-              Text(
-                'Rekam Cepat',
-                style: TextStyle(
-                  color: mainTextColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildQuickRecordItem(
-                    Icons.chat_bubble_outline_rounded,
-                    'Chat',
-                    '20',
-                    cardBgColor,
-                    borderColor,
-                    mainTextColor,
-                    subTextColor,
-                  ),
-                  _buildQuickRecordItem(
-                    Icons.camera_alt_outlined,
-                    'Pindai',
-                    '10',
-                    cardBgColor,
-                    borderColor,
-                    mainTextColor,
-                    subTextColor,
-                  ),
-                  _buildQuickRecordItem(
-                    Icons.mic_none_rounded,
-                    'Suara',
-                    '10',
-                    cardBgColor,
-                    borderColor,
-                    mainTextColor,
-                    subTextColor,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
 
               // 7. "Dompet Saya" Section
               Row(
@@ -1133,64 +1091,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // Quick Record Item Builder
-  Widget _buildQuickRecordItem(
-    IconData icon,
-    String label,
-    String badgeVal,
-    Color cardBgColor,
-    Color borderColor,
-    Color mainTextColor,
-    Color subTextColor,
-  ) {
-    return Column(
-      children: [
-        Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              height: 56,
-              width: 56,
-              decoration: BoxDecoration(
-                color: cardBgColor,
-                shape: BoxShape.circle,
-                border: Border.all(color: borderColor),
-              ),
-              child: Center(child: Icon(icon, color: mainTextColor, size: 24)),
-            ),
-            Positioned(
-              bottom: -4,
-              right: -4,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  badgeVal,
-                  style: const TextStyle(
-                    color: Colors.black54,
-                    fontSize: 8,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        Text(
-          label,
-          style: TextStyle(
-            color: subTextColor,
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
+
 
   // Custom Wallet Card for "Dompet Saya"
   Widget _buildCustomWalletCard(
