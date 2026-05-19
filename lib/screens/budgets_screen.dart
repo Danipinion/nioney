@@ -20,6 +20,12 @@ class BudgetsScreen extends StatelessWidget {
     final provider = Provider.of<AppProvider>(context);
     final theme = Theme.of(context);
     final currency = provider.currencySymbol;
+    final isDark = theme.brightness == Brightness.dark;
+
+    final mainTextColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subTextColor = isDark ? Colors.white.withValues(alpha: 0.45) : const Color(0xFF64748B);
+    final borderColor = isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.05);
+    final cardBgColor = isDark ? theme.cardColor.withValues(alpha: 0.4) : Colors.white;
 
     final numberFormat = NumberFormat.currency(
       locale: 'id_ID',
@@ -28,9 +34,19 @@ class BudgetsScreen extends StatelessWidget {
     );
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Budgets'),
-        automaticallyImplyLeading: false,
+        title: Text(
+          'Budgets',
+          style: TextStyle(
+            color: mainTextColor,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        backgroundColor: theme.appBarTheme.backgroundColor,
+        elevation: 0,
+        automaticallyImplyLeading: true,
+        iconTheme: IconThemeData(color: mainTextColor),
         actions: [
           IconButton(
             onPressed: () => _showAddBudgetSheet(context),
@@ -67,13 +83,13 @@ class BudgetsScreen extends StatelessWidget {
                       Icon(
                         Icons.track_changes_rounded,
                         size: 80,
-                        color: Colors.white.withValues(alpha: 0.12),
+                        color: subTextColor.withValues(alpha: 0.2),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         'No Budgets Set Yet',
                         style: theme.textTheme.titleLarge?.copyWith(
-                          color: Colors.white70,
+                          color: mainTextColor,
                           fontSize: 18,
                         ),
                       ),
@@ -84,7 +100,7 @@ class BudgetsScreen extends StatelessWidget {
                           'Setting budgets helps you limit expenses and build strong financial discipline. Tap "+" to start.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.35),
+                            color: subTextColor,
                             fontSize: 13,
                           ),
                         ),
@@ -114,10 +130,10 @@ class BudgetsScreen extends StatelessWidget {
                   ),
                 ),
               ] else ...[
-                const Text(
+                Text(
                   'Active Monthly Limits',
                   style: TextStyle(
-                    color: Colors.white60,
+                    color: subTextColor,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -137,13 +153,9 @@ class BudgetsScreen extends StatelessWidget {
                     );
 
                     // Recalculate spent dynamically based on live transactions
-                    final double spent = provider.getSpentForCategory(
-                      budget.categoryId,
-                    );
+                    final double spent = provider.getSpentForCategory(budget.categoryId);
                     final double limit = budget.limitAmount;
-                    final double progress = limit > 0
-                        ? (spent / limit).clamp(0.0, 1.0)
-                        : 0.0;
+                    final double progress = limit > 0 ? (spent / limit).clamp(0.0, 1.0) : 0.0;
                     final bool isOver = spent > limit;
                     final bool isWarning = !isOver && (spent / limit) >= 0.8;
 
@@ -162,12 +174,21 @@ class BudgetsScreen extends StatelessWidget {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: theme.cardColor.withValues(alpha: 0.4),
+                        color: cardBgColor,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.04),
+                          color: borderColor,
                           width: 1,
                         ),
+                        boxShadow: isDark
+                            ? null
+                            : [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.02),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                )
+                              ],
                       ),
                       child: Column(
                         children: [
@@ -192,8 +213,8 @@ class BudgetsScreen extends StatelessWidget {
                                   children: [
                                     Text(
                                       category.name,
-                                      style: const TextStyle(
-                                        color: Colors.white,
+                                      style: TextStyle(
+                                        color: mainTextColor,
                                         fontWeight: FontWeight.w800,
                                         fontSize: 15,
                                       ),
@@ -207,12 +228,8 @@ class BudgetsScreen extends StatelessWidget {
                                             vertical: 2,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: statusColor.withValues(
-                                              alpha: 0.1,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              6,
-                                            ),
+                                            color: statusColor.withValues(alpha: 0.1),
+                                            borderRadius: BorderRadius.circular(6),
                                           ),
                                           child: Text(
                                             statusText.toUpperCase(),
@@ -227,9 +244,7 @@ class BudgetsScreen extends StatelessWidget {
                                         Text(
                                           '${(progress * 100).toStringAsFixed(0)}% Used',
                                           style: TextStyle(
-                                            color: Colors.white.withValues(
-                                              alpha: 0.35,
-                                            ),
+                                            color: subTextColor,
                                             fontSize: 10,
                                           ),
                                         ),
@@ -240,11 +255,10 @@ class BudgetsScreen extends StatelessWidget {
                               ),
                               // Delete Button
                               IconButton(
-                                onPressed: () =>
-                                    provider.deleteBudget(budget.id),
+                                onPressed: () => provider.deleteBudget(budget.id),
                                 icon: Icon(
                                   Icons.delete_outline_rounded,
-                                  color: Colors.white.withValues(alpha: 0.25),
+                                  color: subTextColor.withValues(alpha: 0.5),
                                   size: 18,
                                 ),
                               ),
@@ -263,9 +277,7 @@ class BudgetsScreen extends StatelessWidget {
                                   Text(
                                     numberFormat.format(spent),
                                     style: TextStyle(
-                                      color: isOver
-                                          ? const Color(0xFFEF5350)
-                                          : Colors.white,
+                                      color: isOver ? const Color(0xFFEF5350) : mainTextColor,
                                       fontWeight: FontWeight.w800,
                                       fontSize: 16,
                                       fontFamily: 'Outfit',
@@ -274,9 +286,7 @@ class BudgetsScreen extends StatelessWidget {
                                   Text(
                                     ' spent',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.35,
-                                      ),
+                                      color: subTextColor,
                                       fontSize: 11,
                                     ),
                                   ),
@@ -287,18 +297,14 @@ class BudgetsScreen extends StatelessWidget {
                                   Text(
                                     'Limit: ',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.3,
-                                      ),
+                                      color: subTextColor.withValues(alpha: 0.6),
                                       fontSize: 10,
                                     ),
                                   ),
                                   Text(
                                     numberFormat.format(limit),
                                     style: TextStyle(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.8,
-                                      ),
+                                      color: mainTextColor.withValues(alpha: 0.8),
                                       fontWeight: FontWeight.w700,
                                       fontSize: 13,
                                       fontFamily: 'Outfit',
@@ -315,15 +321,11 @@ class BudgetsScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                             child: LinearProgressIndicator(
                               value: progress,
-                              backgroundColor: Colors.white.withValues(
-                                alpha: 0.04,
-                              ),
+                              backgroundColor: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.04),
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 isOver
                                     ? const Color(0xFFEF5350)
-                                    : (isWarning
-                                          ? const Color(0xFFFFCA28)
-                                          : category.color),
+                                    : (isWarning ? const Color(0xFFFFCA28) : category.color),
                               ),
                               minHeight: 8,
                             ),
@@ -361,9 +363,7 @@ class _AddBudgetSheetState extends State<AddBudgetSheet> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<AppProvider>(context, listen: false);
-      final expenseCategories = provider.categories
-          .where((c) => c.isExpense)
-          .toList();
+      final expenseCategories = provider.categories.where((c) => c.isExpense).toList();
       if (expenseCategories.isNotEmpty) {
         setState(() {
           _selectedCategoryId = expenseCategories.first.id;
@@ -383,8 +383,7 @@ class _AddBudgetSheetState extends State<AddBudgetSheet> {
       return;
     }
 
-    final double limit =
-        double.tryParse(_limitController.text.replaceAll(',', '')) ?? 0.0;
+    final double limit = double.tryParse(_limitController.text.replaceAll(',', '')) ?? 0.0;
     if (limit <= 0.0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -398,9 +397,7 @@ class _AddBudgetSheetState extends State<AddBudgetSheet> {
     final provider = Provider.of<AppProvider>(context, listen: false);
 
     // Check if budget for category already exists
-    final exists = provider.budgets.any(
-      (b) => b.categoryId == _selectedCategoryId,
-    );
+    final exists = provider.budgets.any((b) => b.categoryId == _selectedCategoryId);
     if (exists) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -420,10 +417,14 @@ class _AddBudgetSheetState extends State<AddBudgetSheet> {
   Widget build(BuildContext context) {
     final provider = Provider.of<AppProvider>(context);
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-    final expenseCategories = provider.categories
-        .where((c) => c.isExpense)
-        .toList();
+    final mainTextColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subTextColor = isDark ? Colors.white.withValues(alpha: 0.45) : const Color(0xFF64748B);
+    final borderColor = isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05);
+    final cardBgColor = isDark ? theme.cardColor.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.02);
+
+    final expenseCategories = provider.categories.where((c) => c.isExpense).toList();
 
     return Container(
       padding: EdgeInsets.only(
@@ -436,7 +437,7 @@ class _AddBudgetSheetState extends State<AddBudgetSheet> {
           topRight: Radius.circular(32),
         ),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: borderColor,
           width: 1.5,
         ),
       ),
@@ -453,7 +454,7 @@ class _AddBudgetSheetState extends State<AddBudgetSheet> {
                   height: 4,
                   width: 50,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.18),
+                    color: isDark ? Colors.white.withValues(alpha: 0.18) : Colors.black.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -465,14 +466,14 @@ class _AddBudgetSheetState extends State<AddBudgetSheet> {
                   Text(
                     'Set Category Budget',
                     style: theme.textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
+                      color: mainTextColor,
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close, color: Colors.white38),
+                    icon: Icon(Icons.close, color: subTextColor),
                   ),
                 ],
               ),
@@ -482,11 +483,9 @@ class _AddBudgetSheetState extends State<AddBudgetSheet> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: theme.cardColor.withValues(alpha: 0.3),
+                  color: cardBgColor,
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.04),
-                  ),
+                  border: Border.all(color: borderColor),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -494,7 +493,7 @@ class _AddBudgetSheetState extends State<AddBudgetSheet> {
                     Text(
                       'MONTHLY BUDGET LIMIT (${provider.currencySymbol})',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.3),
+                        color: subTextColor,
                         fontSize: 9,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.2,
@@ -505,8 +504,8 @@ class _AddBudgetSheetState extends State<AddBudgetSheet> {
                       children: [
                         Text(
                           provider.currencySymbol,
-                          style: const TextStyle(
-                            color: Colors.white24,
+                          style: TextStyle(
+                            color: subTextColor.withValues(alpha: 0.5),
                             fontSize: 24,
                             fontWeight: FontWeight.w800,
                           ),
@@ -516,15 +515,15 @@ class _AddBudgetSheetState extends State<AddBudgetSheet> {
                           child: TextFormField(
                             controller: _limitController,
                             keyboardType: TextInputType.number,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: mainTextColor,
                               fontSize: 26,
                               fontFamily: 'Outfit',
                               fontWeight: FontWeight.w800,
                             ),
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               hintText: '0',
-                              hintStyle: TextStyle(color: Colors.white24),
+                              hintStyle: TextStyle(color: subTextColor.withValues(alpha: 0.3)),
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.zero,
                             ),
@@ -547,7 +546,7 @@ class _AddBudgetSheetState extends State<AddBudgetSheet> {
               Text(
                 'TARGET CATEGORY',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.3),
+                  color: subTextColor,
                   fontSize: 9,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.2,
@@ -557,23 +556,21 @@ class _AddBudgetSheetState extends State<AddBudgetSheet> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: theme.cardColor.withValues(alpha: 0.3),
+                  color: cardBgColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.04),
-                  ),
+                  border: Border.all(color: borderColor),
                 ),
                 child: DropdownButtonFormField<String>(
                   initialValue: _selectedCategoryId,
                   dropdownColor: theme.cardColor,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: mainTextColor,
                     fontWeight: FontWeight.w700,
                   ),
                   decoration: const InputDecoration(border: InputBorder.none),
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.keyboard_arrow_down_rounded,
-                    color: Colors.white38,
+                    color: subTextColor,
                   ),
                   items: expenseCategories.map((c) {
                     return DropdownMenuItem<String>(
@@ -602,12 +599,7 @@ class _AddBudgetSheetState extends State<AddBudgetSheet> {
                 child: Container(
                   height: 52,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        theme.primaryColor,
-                        Color.lerp(theme.primaryColor, Colors.white, 0.15)!,
-                      ],
-                    ),
+                    color: theme.primaryColor,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(

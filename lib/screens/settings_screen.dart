@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/app_provider.dart';
-import '../widgets/glass_card.dart';
 import '../theme/app_theme.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -10,6 +9,9 @@ class SettingsScreen extends StatelessWidget {
 
   void _showCurrencyPicker(BuildContext context, AppProvider provider) {
     final List<String> currencies = ['Rp', '\$', '€', '£', '¥'];
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final mainTextColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subTextColor = isDark ? Colors.white70 : const Color(0xFF64748B);
 
     showDialog(
       context: context,
@@ -19,9 +21,9 @@ class SettingsScreen extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
           ),
-          title: const Text(
+          title: Text(
             'Global Currency',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(color: mainTextColor, fontWeight: FontWeight.bold),
           ),
           content: SizedBox(
             width: double.maxFinite,
@@ -44,7 +46,7 @@ class SettingsScreen extends StatelessWidget {
                     style: TextStyle(
                       color: isSelected
                           ? Theme.of(context).primaryColor
-                          : Colors.white70,
+                          : subTextColor,
                       fontWeight: isSelected
                           ? FontWeight.bold
                           : FontWeight.normal,
@@ -70,6 +72,12 @@ class SettingsScreen extends StatelessWidget {
   }
 
   void _showResetConfirm(BuildContext context, AppProvider provider) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final mainTextColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subTextColor = isDark
+        ? Colors.white.withValues(alpha: 0.7)
+        : const Color(0xFF64748B);
+
     showDialog(
       context: context,
       builder: (context) {
@@ -78,23 +86,22 @@ class SettingsScreen extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
           ),
-          title: const Text(
+          title: Text(
             'Reset All Data?',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(color: mainTextColor, fontWeight: FontWeight.bold),
           ),
           content: Text(
             'This will permanently delete all your custom wallets, budgets, and transactions, and restore the default starter kit.\n\nThis action cannot be undone.',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
-              fontSize: 13,
-            ),
+            style: TextStyle(color: subTextColor, fontSize: 13),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text(
+              child: Text(
                 'Cancel',
-                style: TextStyle(color: Colors.white38),
+                style: TextStyle(
+                  color: isDark ? Colors.white38 : Colors.black38,
+                ),
               ),
             ),
             TextButton(
@@ -102,11 +109,8 @@ class SettingsScreen extends StatelessWidget {
                 // Clear and reload
                 final prefs = await SharedPreferences.getInstance();
                 await prefs.clear();
-                // We can trigger reload by reinstantiating or restarting,
-                // for simplicity we trigger provider load which fetches empty and applies defaults
                 Navigator.of(context).pop();
 
-                // Fast restart lookalike
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text(
@@ -134,12 +138,30 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = Provider.of<AppProvider>(context);
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final mainTextColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subTextColor = isDark
+        ? Colors.white.withValues(alpha: 0.45)
+        : const Color(0xFF64748B);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.04)
+        : Colors.black.withValues(alpha: 0.05);
+    final cardBgColor = isDark
+        ? theme.cardColor.withValues(alpha: 0.3)
+        : Colors.white;
 
     final currentPalette = provider.currentPalette;
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(
+          'Settings',
+          style: TextStyle(color: mainTextColor, fontWeight: FontWeight.w700),
+        ),
+        backgroundColor: theme.appBarTheme.backgroundColor,
+        elevation: 0,
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(
@@ -152,19 +174,32 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 12),
 
               // Custom Theme Palette Switcher Card
-              const Text(
+              Text(
                 'Aesthetics & Theme',
                 style: TextStyle(
-                  color: Colors.white60,
+                  color: subTextColor,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 12),
 
-              GlassCard(
-                borderRadius: 24,
+              Container(
                 padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: cardBgColor,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: borderColor),
+                  boxShadow: isDark
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.02),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -176,10 +211,10 @@ class SettingsScreen extends StatelessWidget {
                           size: 20,
                         ),
                         const SizedBox(width: 12),
-                        const Text(
+                        Text(
                           'Dark Color Theme',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: mainTextColor,
                             fontWeight: FontWeight.w800,
                             fontSize: 15,
                           ),
@@ -189,10 +224,7 @@ class SettingsScreen extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(
                       'Personalize the dark workspace with unique neon colors.',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.35),
-                        fontSize: 11,
-                      ),
+                      style: TextStyle(color: subTextColor, fontSize: 11),
                     ),
                     const SizedBox(height: 20),
 
@@ -221,12 +253,18 @@ class SettingsScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? val.primary.withValues(alpha: 0.08)
-                                  : Colors.white.withValues(alpha: 0.02),
+                                  : (isDark
+                                        ? Colors.white.withValues(alpha: 0.02)
+                                        : Colors.black.withValues(alpha: 0.02)),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: isSelected
                                     ? val.primary
-                                    : Colors.white.withValues(alpha: 0.04),
+                                    : (isDark
+                                          ? Colors.white.withValues(alpha: 0.04)
+                                          : Colors.black.withValues(
+                                              alpha: 0.05,
+                                            )),
                                 width: isSelected ? 1.5 : 1,
                               ),
                             ),
@@ -255,8 +293,8 @@ class SettingsScreen extends StatelessWidget {
                                     key,
                                     style: TextStyle(
                                       color: isSelected
-                                          ? Colors.white
-                                          : Colors.white54,
+                                          ? mainTextColor
+                                          : subTextColor,
                                       fontWeight: isSelected
                                           ? FontWeight.w800
                                           : FontWeight.w500,
@@ -278,10 +316,10 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 24),
 
               // Account & Core settings
-              const Text(
+              Text(
                 'Account Settings',
                 style: TextStyle(
-                  color: Colors.white60,
+                  color: subTextColor,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
@@ -291,11 +329,18 @@ class SettingsScreen extends StatelessWidget {
               // Currency & Preference Cards
               Container(
                 decoration: BoxDecoration(
-                  color: theme.cardColor.withValues(alpha: 0.3),
+                  color: cardBgColor,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.04),
-                  ),
+                  border: Border.all(color: borderColor),
+                  boxShadow: isDark
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.02),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                 ),
                 child: Column(
                   children: [
@@ -306,20 +351,17 @@ class SettingsScreen extends StatelessWidget {
                         color: theme.primaryColor,
                         size: 20,
                       ),
-                      title: const Text(
+                      title: Text(
                         'Currency Symbol',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: mainTextColor,
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       subtitle: Text(
                         'Change symbols displayed across numbers.',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.35),
-                          fontSize: 11,
-                        ),
+                        style: TextStyle(color: subTextColor, fontSize: 11),
                       ),
                       trailing: Container(
                         padding: const EdgeInsets.symmetric(
@@ -327,7 +369,9 @@ class SettingsScreen extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.04),
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.04)
+                              : Colors.black.withValues(alpha: 0.04),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
@@ -341,11 +385,7 @@ class SettingsScreen extends StatelessWidget {
                       ),
                       onTap: () => _showCurrencyPicker(context, provider),
                     ),
-                    Divider(
-                      color: Colors.white.withValues(alpha: 0.04),
-                      height: 1,
-                      indent: 56,
-                    ),
+                    Divider(color: borderColor, height: 1, indent: 56),
                     // Theme toggler (Information block)
                     ListTile(
                       leading: Icon(
@@ -353,20 +393,17 @@ class SettingsScreen extends StatelessWidget {
                         color: theme.primaryColor,
                         size: 20,
                       ),
-                      title: const Text(
+                      title: Text(
                         'Display Mode',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: mainTextColor,
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       subtitle: Text(
                         'Force light theme or stick to battery-saving dark.',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.35),
-                          fontSize: 11,
-                        ),
+                        style: TextStyle(color: subTextColor, fontSize: 11),
                       ),
                       trailing: Switch(
                         value: provider.themeMode == ThemeMode.dark,

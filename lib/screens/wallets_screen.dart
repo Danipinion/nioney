@@ -641,12 +641,7 @@ class _AddWalletSheetState extends State<AddWalletSheet> {
                 child: Container(
                   height: 52,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        theme.primaryColor,
-                        Color.lerp(theme.primaryColor, Colors.white, 0.15)!,
-                      ],
-                    ),
+                    color: theme.primaryColor,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(

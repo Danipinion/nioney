@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../providers/app_provider.dart';
 import '../models/category.dart';
-import '../widgets/glass_card.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
@@ -21,6 +20,19 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final provider = Provider.of<AppProvider>(context);
     final theme = Theme.of(context);
     final currency = provider.currencySymbol;
+    final isDark = theme.brightness == Brightness.dark;
+
+    // Theme-aware colors
+    final mainTextColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subTextColor = isDark
+        ? Colors.white.withValues(alpha: 0.45)
+        : const Color(0xFF64748B);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.04)
+        : Colors.black.withValues(alpha: 0.05);
+    final cardBgColor = isDark
+        ? theme.cardColor.withValues(alpha: 0.3)
+        : Colors.white;
 
     final breakdown = provider.getCategorySpendingBreakdown();
     final totalExpense = provider.monthlyExpense;
@@ -32,8 +44,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Analytics'),
+        title: Text(
+          'Analytics',
+          style: TextStyle(color: mainTextColor, fontWeight: FontWeight.w700),
+        ),
+        backgroundColor: theme.appBarTheme.backgroundColor,
+        elevation: 0,
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(
@@ -53,13 +71,13 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       Icon(
                         Icons.pie_chart_outline_rounded,
                         size: 80,
-                        color: Colors.white.withValues(alpha: 0.12),
+                        color: subTextColor.withValues(alpha: 0.2),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         'No spending data available',
                         style: theme.textTheme.titleLarge?.copyWith(
-                          color: Colors.white70,
+                          color: mainTextColor,
                           fontSize: 18,
                         ),
                       ),
@@ -69,10 +87,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                         child: Text(
                           'Add some expense transactions to see your financial analytics here.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.35),
-                            fontSize: 13,
-                          ),
+                          style: TextStyle(color: subTextColor, fontSize: 13),
                         ),
                       ),
                     ],
@@ -80,18 +95,31 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 ),
               ] else ...[
                 // Main Chart Card
-                GlassCard(
-                  borderRadius: 28,
+                Container(
                   padding: const EdgeInsets.symmetric(
                     vertical: 24.0,
                     horizontal: 16.0,
+                  ),
+                  decoration: BoxDecoration(
+                    color: cardBgColor,
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(color: borderColor),
+                    boxShadow: isDark
+                        ? null
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.02),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                   ),
                   child: Column(
                     children: [
                       Text(
                         'MONTHLY SPENDING SPLIT',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.4),
+                          color: subTextColor,
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.2,
@@ -143,9 +171,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                                   Text(
                                     'Total Outflow',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.4,
-                                      ),
+                                      color: subTextColor,
                                       fontSize: 11,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -153,8 +179,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                                   const SizedBox(height: 2),
                                   Text(
                                     numberFormat.format(totalExpense),
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      color: mainTextColor,
                                       fontSize: 18,
                                       fontFamily: 'Outfit',
                                       fontWeight: FontWeight.w800,
@@ -173,10 +199,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 const SizedBox(height: 28),
 
                 // Categories Spending Breakdown List
-                const Text(
+                Text(
                   'Spending by Category',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: mainTextColor,
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
                   ),
@@ -203,12 +229,18 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: theme.cardColor.withValues(alpha: 0.3),
+                        color: cardBgColor,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.04),
-                          width: 1,
-                        ),
+                        border: Border.all(color: borderColor, width: 1),
+                        boxShadow: isDark
+                            ? null
+                            : [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.02),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                       ),
                       child: Column(
                         children: [
@@ -233,8 +265,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                                   children: [
                                     Text(
                                       cat.name,
-                                      style: const TextStyle(
-                                        color: Colors.white,
+                                      style: TextStyle(
+                                        color: mainTextColor,
                                         fontWeight: FontWeight.w700,
                                         fontSize: 14,
                                       ),
@@ -242,9 +274,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                                     Text(
                                       '${(percent * 100).toStringAsFixed(1)}% of total spent',
                                       style: TextStyle(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.35,
-                                        ),
+                                        color: subTextColor,
                                         fontSize: 11,
                                       ),
                                     ),
@@ -253,8 +283,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                               ),
                               Text(
                                 numberFormat.format(amt),
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: TextStyle(
+                                  color: mainTextColor,
                                   fontWeight: FontWeight.w800,
                                   fontSize: 14,
                                   fontFamily: 'Outfit',
@@ -268,9 +298,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                             borderRadius: BorderRadius.circular(4),
                             child: LinearProgressIndicator(
                               value: percent,
-                              backgroundColor: Colors.white.withValues(
-                                alpha: 0.05,
-                              ),
+                              backgroundColor: isDark
+                                  ? Colors.white.withValues(alpha: 0.05)
+                                  : Colors.black.withValues(alpha: 0.05),
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 cat.color,
                               ),

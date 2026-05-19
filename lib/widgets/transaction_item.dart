@@ -43,10 +43,17 @@ class TransactionItem extends StatelessWidget {
       decimalDigits: 0,
     );
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final mainTextColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subTextColor = isDark ? Colors.white.withValues(alpha: 0.45) : const Color(0xFF64748B);
+    final dotColor = isDark ? Colors.white.withValues(alpha: 0.2) : Colors.black12;
+    final cardBgColor = isDark ? Theme.of(context).cardColor.withValues(alpha: 0.4) : Colors.white;
+    final borderColor = isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.05);
+
     final String amountPrefix = transaction.isExpense ? '-' : '+';
     final Color amountColor = transaction.isExpense
-        ? Colors.white
-        : const Color(0xFF66BB6A); // Emerald green for income
+        ? (isDark ? Colors.white : const Color(0xFFE53935)) // High-contrast Red/White for Expense
+        : const Color(0xFF00D179); // Vibrant emerald green for income
 
     return Dismissible(
       key: Key(transaction.id),
@@ -69,12 +76,21 @@ class TransactionItem extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12.0),
         padding: const EdgeInsets.all(14.0),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor.withValues(alpha: 0.4),
+          color: cardBgColor,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.04),
+            color: borderColor,
             width: 1,
           ),
+          boxShadow: isDark
+              ? null
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.02),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  )
+                ],
         ),
         child: Row(
           children: [
@@ -100,7 +116,8 @@ class TransactionItem extends StatelessWidget {
                 children: [
                   Text(
                     transaction.title,
-                    style: const TextStyle(
+                    style: TextStyle(
+                      color: mainTextColor,
                       fontWeight: FontWeight.w700,
                       fontSize: 15,
                     ),
@@ -113,7 +130,7 @@ class TransactionItem extends StatelessWidget {
                       Text(
                         category.name,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.45),
+                          color: subTextColor,
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
                         ),
@@ -121,7 +138,7 @@ class TransactionItem extends StatelessWidget {
                       Text(
                         '  •  ',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: dotColor,
                           fontSize: 10,
                         ),
                       ),
@@ -165,7 +182,7 @@ class TransactionItem extends StatelessWidget {
                 Text(
                   _formatDate(transaction.date),
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.35),
+                    color: subTextColor,
                     fontSize: 10,
                   ),
                 ),

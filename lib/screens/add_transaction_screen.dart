@@ -654,16 +654,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       child: Container(
                         height: 56,
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              theme.primaryColor,
-                              Color.lerp(
-                                theme.primaryColor,
-                                Colors.white,
-                                0.2,
-                              )!,
-                            ],
-                          ),
+                          color: theme.primaryColor,
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
