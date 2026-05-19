@@ -155,10 +155,10 @@ class AppProvider with ChangeNotifier {
         final List<dynamic> decoded = jsonDecode(walletsJson);
         _wallets = decoded.map((w) => _walletFromJson(w)).toList();
       } catch (e) {
-        _wallets = Wallet.defaultWallets;
+        _wallets = [];
       }
     } else {
-      _wallets = Wallet.defaultWallets;
+      _wallets = [];
     }
 
     // 5. Load Transactions
@@ -168,10 +168,10 @@ class AppProvider with ChangeNotifier {
         final List<dynamic> decoded = jsonDecode(txJson);
         _transactions = decoded.map((t) => _transactionFromJson(t)).toList();
       } catch (e) {
-        _loadMockTransactions();
+        _transactions = [];
       }
     } else {
-      _loadMockTransactions();
+      _transactions = [];
     }
 
     // 6. Load Budgets
@@ -181,10 +181,10 @@ class AppProvider with ChangeNotifier {
         final List<dynamic> decoded = jsonDecode(budgetsJson);
         _budgets = decoded.map((b) => _budgetFromJson(b)).toList();
       } catch (e) {
-        _loadMockBudgets();
+        _budgets = [];
       }
     } else {
-      _loadMockBudgets();
+      _budgets = [];
     }
 
     notifyListeners();
