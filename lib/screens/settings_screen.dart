@@ -329,7 +329,6 @@ class SettingsScreen extends StatelessWidget {
               // Currency & Preference Cards
               Container(
                 decoration: BoxDecoration(
-                  color: cardBgColor,
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: borderColor),
                   boxShadow: isDark
@@ -342,8 +341,12 @@ class SettingsScreen extends StatelessWidget {
                           ),
                         ],
                 ),
-                child: Column(
-                  children: [
+                child: Material(
+                  color: cardBgColor,
+                  borderRadius: BorderRadius.circular(24),
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    children: [
                     // Currency
                     ListTile(
                       leading: Icon(
@@ -418,6 +421,7 @@ class SettingsScreen extends StatelessWidget {
                   ],
                 ),
               ),
+            ),
               const SizedBox(height: 24),
 
               // Danger Zone
@@ -434,31 +438,35 @@ class SettingsScreen extends StatelessWidget {
               // Reset Card
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.redAccent.withValues(alpha: 0.04),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
                     color: Colors.redAccent.withValues(alpha: 0.12),
                   ),
                 ),
-                child: ListTile(
-                  leading: const Icon(
-                    Icons.restart_alt_rounded,
-                    color: Colors.redAccent,
-                    size: 22,
-                  ),
-                  title: const Text(
-                    'Erase All Data',
-                    style: TextStyle(
+                child: Material(
+                  color: Colors.redAccent.withValues(alpha: 0.04),
+                  borderRadius: BorderRadius.circular(24),
+                  clipBehavior: Clip.antiAlias,
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.restart_alt_rounded,
                       color: Colors.redAccent,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
+                      size: 22,
                     ),
+                    title: const Text(
+                      'Erase All Data',
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    subtitle: const Text(
+                      'Wipe the persistent box storage cleanly.',
+                      style: TextStyle(color: Colors.redAccent, fontSize: 11),
+                    ),
+                    onTap: () => _showResetConfirm(context, provider),
                   ),
-                  subtitle: const Text(
-                    'Wipe the persistent box storage cleanly.',
-                    style: TextStyle(color: Colors.redAccent, fontSize: 11),
-                  ),
-                  onTap: () => _showResetConfirm(context, provider),
                 ),
               ),
 
