@@ -472,63 +472,111 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               const SizedBox(height: 12),
 
-              // Menu Options Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildMenuItem(
-                    context,
-                    Icons.percent_rounded,
-                    'Anggaran',
-                    const Color(0xFFFFECE2),
-                    const Color(0xFFFF7043),
-                    () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const BudgetsScreen(),
-                        ),
-                      );
-                    },
-                    subTextColor,
-                  ),
-                  _buildMenuItem(
-                    context,
-                    Icons.cached_rounded,
-                    'Berulang',
-                    const Color(0xFFE3F2FD),
-                    const Color(0xFF42A5F5),
-                    () {},
-                    subTextColor,
-                  ),
-                  _buildMenuItem(
-                    context,
-                    Icons.savings_rounded,
-                    'Target Ta...',
-                    const Color(0xFFE8F5E9),
-                    const Color(0xFF66BB6A),
-                    () {},
-                    subTextColor,
-                  ),
-                  _buildMenuItem(
-                    context,
-                    Icons.receipt_long_rounded,
-                    'Tagihan',
-                    const Color(0xFFFFEBEE),
-                    const Color(0xFFEF5350),
-                    () {},
-                    subTextColor,
-                  ),
-                  _buildMenuItem(
-                    context,
-                    Icons.payment_rounded,
-                    'Utang',
-                    const Color(0xFFF3E5F5),
-                    const Color(0xFFAB47BC),
-                    () {},
-                    subTextColor,
-                  ),
-                ],
+              // Menu Options Slider (Horizontal Scrollable Row)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  children: [
+                    _buildMenuItem(
+                      context,
+                      Icons.percent_rounded,
+                      'Anggaran',
+                      const Color(0xFFFFECE2),
+                      const Color(0xFFFF7043),
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const BudgetsScreen(),
+                          ),
+                        );
+                      },
+                      subTextColor,
+                    ),
+                    _buildMenuItem(
+                      context,
+                      Icons.cached_rounded,
+                      'Berulang',
+                      const Color(0xFFE3F2FD),
+                      const Color(0xFF42A5F5),
+                      () {},
+                      subTextColor,
+                    ),
+                    _buildMenuItem(
+                      context,
+                      Icons.savings_rounded,
+                      'Target',
+                      const Color(0xFFE8F5E9),
+                      const Color(0xFF66BB6A),
+                      () {},
+                      subTextColor,
+                    ),
+                    _buildMenuItem(
+                      context,
+                      Icons.receipt_long_rounded,
+                      'Tagihan',
+                      const Color(0xFFFFEBEE),
+                      const Color(0xFFEF5350),
+                      () {},
+                      subTextColor,
+                    ),
+                    _buildMenuItem(
+                      context,
+                      Icons.payment_rounded,
+                      'Utang',
+                      const Color(0xFFF3E5F5),
+                      const Color(0xFFAB47BC),
+                      () {},
+                      subTextColor,
+                    ),
+                    _buildMenuItem(
+                      context,
+                      Icons.favorite_rounded,
+                      'Keinginan',
+                      const Color(0xFFFFF8E1),
+                      const Color(0xFFFFB300),
+                      () {},
+                      subTextColor,
+                    ),
+                    _buildMenuItem(
+                      context,
+                      Icons.credit_card_rounded,
+                      'Kartu',
+                      const Color(0xFFE0F7FA),
+                      const Color(0xFF00ACC1),
+                      () {},
+                      subTextColor,
+                    ),
+                    _buildMenuItem(
+                      context,
+                      Icons.edit_note_rounded,
+                      'Catatan',
+                      const Color(0xFFEFEBE9),
+                      const Color(0xFF8D6E63),
+                      () {},
+                      subTextColor,
+                    ),
+                    _buildMenuItem(
+                      context,
+                      Icons.currency_exchange_rounded,
+                      'Reimburse',
+                      const Color(0xFFF1F8E9),
+                      const Color(0xFF7CB342),
+                      () {},
+                      subTextColor,
+                    ),
+                    _buildMenuItem(
+                      context,
+                      Icons.trending_up_rounded,
+                      'Aset',
+                      const Color(0xFFECEFF1),
+                      const Color(0xFF607D8B),
+                      () {},
+                      subTextColor,
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
 
@@ -863,27 +911,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
   ) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            height: 52,
-            width: 52,
-            decoration: BoxDecoration(
-              color: bgCircleColor,
-              shape: BoxShape.circle,
+      child: SizedBox(
+        width: 76,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 52,
+              width: 52,
+              decoration: BoxDecoration(
+                color: bgCircleColor,
+                shape: BoxShape.circle,
+              ),
+              child: Center(child: Icon(icon, color: iconColor, size: 24)),
             ),
-            child: Center(child: Icon(icon, color: iconColor, size: 24)),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            style: TextStyle(
-              color: labelColor,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: labelColor,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
