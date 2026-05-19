@@ -59,10 +59,12 @@ class AppProvider with ChangeNotifier {
       const Category(id: 'personal', name: 'Pribadi', icon: Icons.person_rounded, color: Color(0xFFBA68C8), isExpense: true),
       const Category(id: 'financial', name: 'Keuangan', icon: Icons.payments_rounded, color: Color(0xFF64748B), isExpense: true),
       const Category(id: 'social', name: 'Teman', icon: Icons.group_rounded, color: Color(0xFF26C6DA), isExpense: true),
-      const Category(id: 'salary', name: 'Gaji', icon: Icons.account_balance_wallet_rounded, color: Color(0xFF66BB6A), isExpense: false),
-      const Category(id: 'investment', name: 'Investasi', icon: Icons.trending_up_rounded, color: Color(0xFF26C6DA), isExpense: false),
-      const Category(id: 'other_income', name: 'Pemasukan Lain', icon: Icons.savings_rounded, color: Color(0xFF78909C), isExpense: false),
       const Category(id: 'other_expense', name: 'Lain-lain', icon: Icons.more_horiz_rounded, color: Color(0xFF8D6E63), isExpense: true),
+      const Category(id: 'salary', name: 'Gaji', icon: Icons.account_balance_wallet_rounded, color: Color(0xFF66BB6A), isExpense: false),
+      const Category(id: 'business', name: 'Bisnis', icon: Icons.storefront_rounded, color: Color(0xFFFFA726), isExpense: false),
+      const Category(id: 'investment', name: 'Investasi', icon: Icons.trending_up_rounded, color: Color(0xFF26C6DA), isExpense: false),
+      const Category(id: 'gift', name: 'Hadiah', icon: Icons.card_giftcard_rounded, color: Color(0xFFEC407A), isExpense: false),
+      const Category(id: 'other_income', name: 'Pemasukan Lain', icon: Icons.savings_rounded, color: Color(0xFF78909C), isExpense: false),
     ];
   }
 
@@ -78,10 +80,12 @@ class AppProvider with ChangeNotifier {
       'personal': ['Potong Rambut', 'Spa', 'Kosmetik'],
       'financial': ['Pajak', 'Biaya Admin', 'Denda', 'Asuransi', 'Donasi/Sedekah', 'Zakat'],
       'social': ['Transfer', 'Traktir', 'Refund', 'Loan', 'Gift'],
-      'salary': ['Gaji Pokok', 'Bonus', 'THR', 'Uang Lembur', 'Komisi'],
-      'investment': ['Saham', 'Reksadana', 'Emas', 'Kripto', 'Obligasi'],
-      'other_income': ['Cashback', 'Hadiah', 'Penjualan Barang', 'Bunga Bank', 'Lain-lain'],
       'other_expense': ['Donasi', 'Zakat', 'Biaya Admin', 'Denda', 'Kehilangan', 'Lain-lain'],
+      'salary': ['Bulanan', 'Mingguan', 'Bonus', 'Lembur'],
+      'business': ['Penjualan', 'Jasa', 'Keuntungan'],
+      'investment': ['Dividen', 'Bunga', 'Kripto', 'Saham', 'Real Estate'],
+      'gift': ['Ulang Tahun', 'Hari Raya', 'Uang Saku'],
+      'other_income': ['Pengembalian Dana', 'Hibah', 'Lotere', 'Penjualan Barang'],
     };
   }
 
@@ -96,7 +100,10 @@ class AppProvider with ChangeNotifier {
       try {
         final List<dynamic> decoded = jsonDecode(categoriesJson);
         _categories = decoded.map((c) => _categoryFromJson(c)).toList();
-        if (!_categories.any((c) => c.id == 'social') || !_categories.any((c) => c.id == 'financial')) {
+        if (!_categories.any((c) => c.id == 'social') || 
+            !_categories.any((c) => c.id == 'financial') ||
+            !_categories.any((c) => c.id == 'business') ||
+            !_categories.any((c) => c.id == 'gift')) {
           needsForceDefaults = true;
         }
       } catch (e) {

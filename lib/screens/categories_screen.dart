@@ -341,17 +341,17 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       // System Tab
       displayedCategories = [
         const Category(id: 'sys_transfer', name: 'Transfer', icon: Icons.swap_horiz_rounded, color: Colors.indigo, isExpense: true),
+        const Category(id: 'sys_recurring', name: 'Berulang', icon: Icons.repeat_rounded, color: Colors.blueGrey, isExpense: true),
+        const Category(id: 'sys_wishlist', name: 'Keinginan', icon: Icons.favorite_rounded, color: Colors.pinkAccent, isExpense: true),
+        const Category(id: 'sys_bills', name: 'Tagihan', icon: Icons.receipt_long_rounded, color: Colors.redAccent, isExpense: true),
+        const Category(id: 'sys_debt', name: 'Hutang Piutang', icon: Icons.account_balance_wallet_rounded, color: Colors.deepOrange, isExpense: true),
+        const Category(id: 'sys_saving_target', name: 'Target Tabungan', icon: Icons.track_changes_rounded, color: Colors.green, isExpense: true),
+        const Category(id: 'sys_bundled_notes', name: 'Catatan Terbundle', icon: Icons.library_books_rounded, color: Colors.brown, isExpense: true),
+        const Category(id: 'sys_reimburse', name: 'Reimburse', icon: Icons.handshake_rounded, color: Colors.orange, isExpense: true),
         const Category(id: 'sys_adjustment', name: 'Penyesuaian Saldo', icon: Icons.adjust_rounded, color: Colors.teal, isExpense: true),
-        const Category(id: 'sys_reimburse', name: 'Titip Bayar', icon: Icons.handshake_rounded, color: Colors.orange, isExpense: true),
+        const Category(id: 'sys_investasi', name: 'Investasi', icon: Icons.trending_up_rounded, color: Colors.cyan, isExpense: true),
       ];
     }
-
-    // Static subcategories for system tab
-    final systemSubCategories = {
-      'sys_transfer': ['Antar Dompet', 'Penarikan Tunai', 'Setoran Tunai'],
-      'sys_adjustment': ['Selisih Catatan', 'Bunga Bank', 'Biaya Admin'],
-      'sys_reimburse': ['Reimburse Kantor', 'Patungan Makan', 'Talangan Teman'],
-    };
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
@@ -474,7 +474,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
                 // Fetch dynamic subcategories
                 final List<String> subs = _activeTab == 2
-                    ? (systemSubCategories[cat.id] ?? [])
+                    ? []
                     : provider.getSubCategoriesForCategory(cat.id);
 
                 return Container(
@@ -491,7 +491,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       children: [
                       ListTile(
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        onTap: () => _toggleExpanded(cat.id),
+                        onTap: _activeTab != 2 ? () => _toggleExpanded(cat.id) : null,
                         leading: Container(
                           height: 48,
                           width: 48,
@@ -510,17 +510,17 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             fontFamily: 'Outfit',
                           ),
                         ),
-                        subtitle: Text(
+                        subtitle: _activeTab != 2 ? Text(
                           '${subs.length} sub-kategori',
                           style: TextStyle(
                             color: subTextColor,
                             fontSize: 11,
                           ),
-                        ),
-                        trailing: Icon(
+                        ) : null,
+                        trailing: _activeTab != 2 ? Icon(
                           isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
                           color: subTextColor,
-                        ),
+                        ) : null,
                       ),
 
                       // Expanded subcategories section
@@ -545,37 +545,39 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                   ),
                                 )
                               else
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
+                                Column(
                                   children: subs.map((subName) {
                                     return Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      margin: const EdgeInsets.only(bottom: 8),
                                       decoration: BoxDecoration(
                                         color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
                                         borderRadius: BorderRadius.circular(12),
                                         border: Border.all(color: borderCol),
                                       ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
+                                      child: Material(
+                                        color: Colors.transparent,
+                                        child: ListTile(
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                                          dense: true,
+                                          title: Text(
                                             subName,
                                             style: TextStyle(
                                               color: textColor,
-                                              fontSize: 12,
+                                              fontSize: 13,
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
-                                          // Only allow deletion for custom/non-system tabs
-                                          if (_activeTab != 2) ...[
-                                            const SizedBox(width: 6),
-                                            GestureDetector(
-                                              onTap: () => provider.deleteSubCategory(cat.id, subName),
-                                              child: Icon(Icons.close_rounded, size: 14, color: Colors.redAccent.withValues(alpha: 0.8)),
-                                            ),
-                                          ],
-                                        ],
+                                          trailing: _activeTab != 2
+                                              ? IconButton(
+                                                  icon: Icon(
+                                                    Icons.delete_outline_rounded,
+                                                    size: 18,
+                                                    color: Colors.redAccent.withValues(alpha: 0.8),
+                                                  ),
+                                                  onPressed: () => provider.deleteSubCategory(cat.id, subName),
+                                                )
+                                              : null,
+                                        ),
                                       ),
                                     );
                                   }).toList(),
