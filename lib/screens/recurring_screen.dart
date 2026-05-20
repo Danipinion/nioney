@@ -613,6 +613,11 @@ class _RecurringScreenState extends State<RecurringScreen> {
                                     onTap: () {
                                       setPageState(() {
                                         selectedSubCategory = subCat['name'];
+                                        final currentTitle = titleController.text.trim();
+                                        final isCurrentlySubCatName = subCategories.any((sc) => sc['name'] == currentTitle) || currentTitle.isEmpty;
+                                        if (isCurrentlySubCatName) {
+                                          titleController.text = subCat['name'];
+                                        }
                                       });
                                     },
                                     child: AnimatedContainer(
@@ -1102,7 +1107,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                                           Icon(cat.icon, size: 10, color: categoryCol),
                                           const SizedBox(width: 2),
                                           Text(
-                                            cat.name + (item.subCategory.isNotEmpty ? ' > ${item.subCategory}' : ''),
+                                            cat.name + (item.subCategory.isNotEmpty ? ' › ${item.subCategory}' : ''),
                                             style: TextStyle(color: categoryCol, fontSize: 10, fontWeight: FontWeight.bold),
                                           ),
                                         ],

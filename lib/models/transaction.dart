@@ -4,6 +4,7 @@ class Transaction {
   final double amount;
   final bool isExpense;
   final String categoryId;
+  final String subCategory;
   final String walletId;
   final DateTime date;
   final String note;
@@ -14,6 +15,7 @@ class Transaction {
     required this.amount,
     required this.isExpense,
     required this.categoryId,
+    this.subCategory = '',
     required this.walletId,
     required this.date,
     this.note = '',
@@ -25,6 +27,7 @@ class Transaction {
     double? amount,
     bool? isExpense,
     String? categoryId,
+    String? subCategory,
     String? walletId,
     DateTime? date,
     String? note,
@@ -35,6 +38,7 @@ class Transaction {
       amount: amount ?? this.amount,
       isExpense: isExpense ?? this.isExpense,
       categoryId: categoryId ?? this.categoryId,
+      subCategory: subCategory ?? this.subCategory,
       walletId: walletId ?? this.walletId,
       date: date ?? this.date,
       note: note ?? this.note,

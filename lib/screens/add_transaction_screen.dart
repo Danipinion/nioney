@@ -79,6 +79,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         setState(() {
           _transactionTypeIndex = tx.categoryId == 'sys_transfer' ? 2 : (tx.isExpense ? 0 : 1);
           _selectedCategoryId = tx.categoryId;
+          _selectedSubCategory = tx.subCategory;
           _selectedWalletId = tx.walletId;
           _selectedDate = tx.date;
           _amountStr = tx.amount.toInt().toString();
@@ -324,6 +325,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           amount: parsedAmount,
           isExpense: true,
           categoryId: 'sys_transfer',
+          subCategory: 'Transfer',
           walletId: _selectedWalletId!,
           date: _selectedDate,
           note: noteText,
@@ -334,6 +336,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           amount: parsedAmount,
           isExpense: true,
           categoryId: 'sys_transfer',
+          subCategory: 'Transfer',
           walletId: _selectedWalletId!,
           date: _selectedDate,
           note: noteText,
@@ -346,6 +349,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           amount: parsedAmount,
           isExpense: false,
           categoryId: 'sys_transfer',
+          subCategory: 'Transfer',
           walletId: _destinationWalletId!,
           date: _selectedDate,
           note: noteText,
@@ -357,15 +361,30 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         finalTitle = _selectedSubCategory.isNotEmpty ? _selectedSubCategory : 'Transaksi Tanpa Judul';
       }
 
-      await provider.addTransaction(
-        title: finalTitle,
-        amount: parsedAmount,
-        isExpense: _transactionTypeIndex == 0,
-        categoryId: _selectedCategoryId!,
-        walletId: _selectedWalletId!,
-        date: _selectedDate,
-        note: noteText,
-      );
+      if (widget.editItem != null) {
+        await provider.updateTransaction(Transaction(
+          id: widget.editItem!.id,
+          title: finalTitle,
+          amount: parsedAmount,
+          isExpense: _transactionTypeIndex == 0,
+          categoryId: _selectedCategoryId!,
+          subCategory: _selectedSubCategory,
+          walletId: _selectedWalletId!,
+          date: _selectedDate,
+          note: noteText,
+        ));
+      } else {
+        await provider.addTransaction(
+          title: finalTitle,
+          amount: parsedAmount,
+          isExpense: _transactionTypeIndex == 0,
+          categoryId: _selectedCategoryId!,
+          subCategory: _selectedSubCategory,
+          walletId: _selectedWalletId!,
+          date: _selectedDate,
+          note: noteText,
+        );
+      }
     }
 
     if (mounted) {
@@ -978,13 +997,17 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                               final subCat = subCategories[index];
                               final isSelected = _selectedSubCategory == subCat['name'];
                               final activeColor = activeMainCategory.color;
-                              return GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _selectedSubCategory = subCat['name'];
-                                    _titleController.text = subCat['name'];
-                                  });
-                                },
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedSubCategory = subCat['name'];
+                                      final currentTitle = _titleController.text.trim();
+                                      final isCurrentlySubCatName = subCategories.any((sc) => sc['name'] == currentTitle) || currentTitle.isEmpty;
+                                      if (isCurrentlySubCatName) {
+                                        _titleController.text = subCat['name'];
+                                      }
+                                    });
+                                  },
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 150),
                                   margin: const EdgeInsets.only(right: 8),

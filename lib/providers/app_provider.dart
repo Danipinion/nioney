@@ -270,6 +270,7 @@ class AppProvider with ChangeNotifier {
     required double amount,
     required bool isExpense,
     required String categoryId,
+    String subCategory = '',
     required String walletId,
     required DateTime date,
     String note = '',
@@ -280,6 +281,7 @@ class AppProvider with ChangeNotifier {
       amount: amount,
       isExpense: isExpense,
       categoryId: categoryId,
+      subCategory: subCategory,
       walletId: walletId,
       date: date,
       note: note,
@@ -370,6 +372,7 @@ class AppProvider with ChangeNotifier {
   // Budget Operations
   Future<void> addBudget({
     required String categoryId,
+    String subCategory = '',
     required double limitAmount,
     String period = 'Monthly',
   }) async {
@@ -524,22 +527,14 @@ class AppProvider with ChangeNotifier {
   }
 
   IconData _getIconFromCodePoint(int codePoint) {
-    if (codePoint == Icons.payments_rounded.codePoint)
-      return Icons.payments_rounded;
-    if (codePoint == Icons.account_balance_rounded.codePoint)
-      return Icons.account_balance_rounded;
-    if (codePoint == Icons.phone_android_rounded.codePoint)
-      return Icons.phone_android_rounded;
-    if (codePoint == Icons.credit_card_rounded.codePoint)
-      return Icons.credit_card_rounded;
-    if (codePoint == Icons.account_balance_wallet_rounded.codePoint)
-      return Icons.account_balance_wallet_rounded;
-    if (codePoint == Icons.savings_rounded.codePoint)
-      return Icons.savings_rounded;
-    if (codePoint == Icons.shopping_bag_rounded.codePoint)
-      return Icons.shopping_bag_rounded;
-    if (codePoint == Icons.directions_car_rounded.codePoint)
-      return Icons.directions_car_rounded;
+    if (codePoint == Icons.payments_rounded.codePoint) { return Icons.payments_rounded; }
+    if (codePoint == Icons.account_balance_rounded.codePoint) { return Icons.account_balance_rounded; }
+    if (codePoint == Icons.phone_android_rounded.codePoint) { return Icons.phone_android_rounded; }
+    if (codePoint == Icons.credit_card_rounded.codePoint) { return Icons.credit_card_rounded; }
+    if (codePoint == Icons.account_balance_wallet_rounded.codePoint) { return Icons.account_balance_wallet_rounded; }
+    if (codePoint == Icons.savings_rounded.codePoint) { return Icons.savings_rounded; }
+    if (codePoint == Icons.shopping_bag_rounded.codePoint) { return Icons.shopping_bag_rounded; }
+    if (codePoint == Icons.directions_car_rounded.codePoint) { return Icons.directions_car_rounded; }
     return Icons.account_balance_wallet_rounded;
   }
 
@@ -561,7 +556,7 @@ class AppProvider with ChangeNotifier {
       'name': w.name,
       'balance': w.balance,
       'type': w.type,
-      'color': w.color.value,
+      'color': w.color.toARGB32(),
       'icon': w.icon.codePoint,
     };
   }
@@ -573,6 +568,7 @@ class AppProvider with ChangeNotifier {
       amount: (json['amount'] as num).toDouble(),
       isExpense: json['isExpense'],
       categoryId: json['categoryId'],
+      subCategory: json['subCategory'] ?? '',
       walletId: json['walletId'],
       date: DateTime.parse(json['date']),
       note: json['note'] ?? '',
@@ -586,6 +582,7 @@ class AppProvider with ChangeNotifier {
       'amount': t.amount,
       'isExpense': t.isExpense,
       'categoryId': t.categoryId,
+      'subCategory': t.subCategory,
       'walletId': t.walletId,
       'date': t.date.toIso8601String(),
       'note': t.note,
@@ -610,94 +607,7 @@ class AppProvider with ChangeNotifier {
     };
   }
 
-  // Initializing mock data if database is fresh
-  void _loadMockTransactions() {
-    final now = DateTime.now();
-    _transactions = [
-      Transaction(
-        id: 'tx_1',
-        title: 'Monthly Salary',
-        amount: 8500000.0,
-        isExpense: false,
-        categoryId: 'salary',
-        walletId: 'wallet_bank',
-        date: now.subtract(const Duration(days: 3)),
-        note: 'Main income source',
-      ),
-      Transaction(
-        id: 'tx_2',
-        title: 'Starbucks Coffee',
-        amount: 58000.0,
-        isExpense: true,
-        categoryId: 'food',
-        walletId: 'wallet_cash',
-        date: now.subtract(const Duration(hours: 4)),
-        note: 'Caramel Macchiato',
-      ),
-      Transaction(
-        id: 'tx_3',
-        title: 'Sushi Dinner',
-        amount: 230000.0,
-        isExpense: true,
-        categoryId: 'food',
-        walletId: 'wallet_gopay',
-        date: now.subtract(const Duration(days: 1)),
-        note: 'Dinner with friends',
-      ),
-      Transaction(
-        id: 'tx_4',
-        title: 'Cinema Tickets',
-        amount: 90000.0,
-        isExpense: true,
-        categoryId: 'entertainment',
-        walletId: 'wallet_credit',
-        date: now.subtract(const Duration(days: 2)),
-        note: 'Doctor Strange 2 tickets',
-      ),
-      Transaction(
-        id: 'tx_5',
-        title: 'Indomaret Groceries',
-        amount: 320000.0,
-        isExpense: true,
-        categoryId: 'shopping',
-        walletId: 'wallet_bank',
-        date: now.subtract(const Duration(days: 4)),
-        note: 'Weekly essential items',
-      ),
-      Transaction(
-        id: 'tx_6',
-        title: 'Gojek Ride',
-        amount: 25000.0,
-        isExpense: true,
-        categoryId: 'transport',
-        walletId: 'wallet_gopay',
-        date: now.subtract(const Duration(days: 1, hours: 2)),
-        note: 'Commute to office',
-      ),
-      Transaction(
-        id: 'tx_7',
-        title: 'Home WiFi Bill',
-        amount: 380000.0,
-        isExpense: true,
-        categoryId: 'bills',
-        walletId: 'wallet_bank',
-        date: now.subtract(const Duration(days: 5)),
-        note: 'Biznet monthly subscription',
-      ),
-    ];
-  }
 
-  void _loadMockBudgets() {
-    _budgets = [
-      const Budget(id: 'budget_1', categoryId: 'food', limitAmount: 2000000.0),
-      const Budget(
-        id: 'budget_2',
-        categoryId: 'shopping',
-        limitAmount: 1500000.0,
-      ),
-      const Budget(id: 'budget_3', categoryId: 'bills', limitAmount: 1000000.0),
-    ];
-  }
 
   Future<void> addCategory({
     required String name,
@@ -771,7 +681,7 @@ class AppProvider with ChangeNotifier {
       'id': c.id,
       'name': c.name,
       'icon': c.icon.codePoint,
-      'color': c.color.value,
+      'color': c.color.toARGB32(),
       'isExpense': c.isExpense,
     };
   }

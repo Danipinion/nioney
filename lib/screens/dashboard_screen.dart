@@ -5,6 +5,7 @@ import '../providers/app_provider.dart';
 import '../models/wallet.dart';
 import '../widgets/transaction_item.dart';
 import 'add_transaction_screen.dart';
+import 'transactions_screen.dart';
 import 'budgets_screen.dart';
 import 'recurring_screen.dart';
 import 'savings_targets_screen.dart';
@@ -893,7 +894,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   if (filteredTransactions.isNotEmpty)
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const TransactionsScreen()));
+                      },
                       child: Text(
                         'Lihat Semua',
                         style: TextStyle(

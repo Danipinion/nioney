@@ -138,7 +138,9 @@ class TransactionItem extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        category.name,
+                        transaction.subCategory.isNotEmpty
+                            ? '${category.name} › ${transaction.subCategory}'
+                            : category.name,
                         style: TextStyle(
                           color: subTextColor,
                           fontSize: 11,
