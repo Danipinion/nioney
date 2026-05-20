@@ -11,6 +11,7 @@ class TransactionItem extends StatelessWidget {
   final Wallet wallet;
   final String currencySymbol;
   final VoidCallback? onDelete;
+  final VoidCallback? onTap;
 
   const TransactionItem({
     super.key,
@@ -19,6 +20,7 @@ class TransactionItem extends StatelessWidget {
     required this.wallet,
     required this.currencySymbol,
     this.onDelete,
+    this.onTap,
   });
 
   String _formatDate(DateTime date) {
@@ -78,9 +80,11 @@ class TransactionItem extends StatelessWidget {
           onDelete!();
         }
       },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12.0),
-        padding: const EdgeInsets.all(14.0),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 12.0),
+          padding: const EdgeInsets.all(14.0),
         decoration: BoxDecoration(
           color: cardBgColor,
           borderRadius: BorderRadius.circular(20),
@@ -196,6 +200,7 @@ class TransactionItem extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

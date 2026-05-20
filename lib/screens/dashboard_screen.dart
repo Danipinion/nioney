@@ -1004,6 +1004,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           wallet: wallet,
                           currencySymbol: currency,
                           onDelete: () => provider.deleteTransaction(tx.id),
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => AddTransactionScreen(editItem: tx),
+                            );
+                          },
                         );
                       },
                     ),

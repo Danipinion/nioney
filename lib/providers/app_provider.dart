@@ -69,6 +69,7 @@ class AppProvider with ChangeNotifier {
       const Category(id: 'investment', name: 'Investasi', icon: Icons.trending_up_rounded, color: Color(0xFF26C6DA), isExpense: false),
       const Category(id: 'gift', name: 'Hadiah', icon: Icons.card_giftcard_rounded, color: Color(0xFFEC407A), isExpense: false),
       const Category(id: 'other_income', name: 'Pemasukan Lain', icon: Icons.savings_rounded, color: Color(0xFF78909C), isExpense: false),
+      const Category(id: 'sys_transfer', name: 'Transfer', icon: Icons.swap_horiz_rounded, color: Color(0xFF9E9E9E), isExpense: true),
     ];
   }
 
@@ -292,6 +293,24 @@ class AppProvider with ChangeNotifier {
     await _saveTransactions();
     await _saveWallets();
     notifyListeners();
+  }
+
+  Future<void> updateTransaction(Transaction updated) async {
+    final index = _transactions.indexWhere((tx) => tx.id == updated.id);
+    if (index != -1) {
+      final oldTx = _transactions[index];
+      // Revert old transaction
+      _updateWalletBalance(oldTx.walletId, oldTx.isExpense ? oldTx.amount : -oldTx.amount);
+      
+      // Apply new transaction
+      _updateWalletBalance(updated.walletId, updated.isExpense ? -updated.amount : updated.amount);
+      
+      _transactions[index] = updated;
+      
+      await _saveTransactions();
+      await _saveWallets();
+      notifyListeners();
+    }
   }
 
   Future<void> deleteTransaction(String id) async {

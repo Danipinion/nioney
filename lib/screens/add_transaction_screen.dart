@@ -4,8 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/app_provider.dart';
 
+import '../models/transaction.dart';
 class AddTransactionScreen extends StatefulWidget {
-  const AddTransactionScreen({super.key});
+  final Transaction? editItem;
+  const AddTransactionScreen({super.key, this.editItem});
 
   @override
   State<AddTransactionScreen> createState() => _AddTransactionScreenState();
@@ -71,17 +73,36 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<AppProvider>(context, listen: false);
-      if (provider.wallets.isNotEmpty) {
+      
+      if (widget.editItem != null) {
+        final tx = widget.editItem!;
         setState(() {
-          _selectedWalletId = provider.wallets.first.id;
-          if (provider.wallets.length > 1) {
-            _destinationWalletId = provider.wallets[1].id;
-          } else {
+          _transactionTypeIndex = tx.categoryId == 'sys_transfer' ? 2 : (tx.isExpense ? 0 : 1);
+          _selectedCategoryId = tx.categoryId;
+          _selectedWalletId = tx.walletId;
+          _selectedDate = tx.date;
+          _amountStr = tx.amount.toInt().toString();
+          _titleController.text = tx.title;
+          _noteController.text = tx.note;
+          
+          if (provider.wallets.isNotEmpty) {
             _destinationWalletId = provider.wallets.first.id;
           }
+          _syncSplits();
         });
+      } else {
+        if (provider.wallets.isNotEmpty) {
+          setState(() {
+            _selectedWalletId = provider.wallets.first.id;
+            if (provider.wallets.length > 1) {
+              _destinationWalletId = provider.wallets[1].id;
+            } else {
+              _destinationWalletId = provider.wallets.first.id;
+            }
+          });
+        }
+        _updateCategorySelection(provider);
       }
-      _updateCategorySelection(provider);
     });
   }
 
@@ -295,25 +316,41 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       final sourceTitle = 'Transfer ke ${destWallet.name}';
       final destTitle = 'Transfer dari ${sourceWallet.name}';
 
-      await provider.addTransaction(
-        title: sourceTitle,
-        amount: parsedAmount,
-        isExpense: true,
-        categoryId: 'sys_transfer',
-        walletId: _selectedWalletId!,
-        date: _selectedDate,
-        note: noteText,
-      );
+      if (widget.editItem != null) {
+        // Warning: Edit transfer is not fully supported for two sides simultaneously, so we just update the source transaction if edited
+        await provider.updateTransaction(Transaction(
+          id: widget.editItem!.id,
+          title: sourceTitle,
+          amount: parsedAmount,
+          isExpense: true,
+          categoryId: 'sys_transfer',
+          walletId: _selectedWalletId!,
+          date: _selectedDate,
+          note: noteText,
+        ));
+      } else {
+        await provider.addTransaction(
+          title: sourceTitle,
+          amount: parsedAmount,
+          isExpense: true,
+          categoryId: 'sys_transfer',
+          walletId: _selectedWalletId!,
+          date: _selectedDate,
+          note: noteText,
+        );
+      }
 
-      await provider.addTransaction(
-        title: destTitle,
-        amount: parsedAmount,
-        isExpense: false,
-        categoryId: 'sys_transfer',
-        walletId: _destinationWalletId!,
-        date: _selectedDate,
-        note: noteText,
-      );
+      if (widget.editItem == null) {
+        await provider.addTransaction(
+          title: destTitle,
+          amount: parsedAmount,
+          isExpense: false,
+          categoryId: 'sys_transfer',
+          walletId: _destinationWalletId!,
+          date: _selectedDate,
+          note: noteText,
+        );
+      }
     } else {
       String finalTitle = _titleController.text.trim();
       if (finalTitle.isEmpty) {
