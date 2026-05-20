@@ -850,31 +850,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         style: TextStyle(color: subTextColor),
                       ),
                     )
-                  : GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 1.4,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                          ),
-                      itemCount: provider.wallets.length > 2
-                          ? 2
-                          : provider.wallets.length,
-                      itemBuilder: (context, index) {
-                        final wallet = provider.wallets[index];
-                        return _buildCustomWalletCard(
-                          context,
-                          wallet,
-                          cardBgColor,
-                          borderColor,
-                          mainTextColor,
-                          subTextColor,
-                          numberFormat,
-                        );
-                      },
+                  : SizedBox(
+                      height: 110,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: provider.wallets.length,
+                        itemBuilder: (context, index) {
+                          final wallet = provider.wallets[index];
+                          return Container(
+                            width: 160,
+                            margin: EdgeInsets.only(
+                              right: index == provider.wallets.length - 1 ? 0 : 12,
+                            ),
+                            child: _buildCustomWalletCard(
+                              context,
+                              wallet,
+                              cardBgColor,
+                              borderColor,
+                              mainTextColor,
+                              subTextColor,
+                              numberFormat,
+                            ),
+                          );
+                        },
+                      ),
                     ),
               const SizedBox(height: 24),
 
