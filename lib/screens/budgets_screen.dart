@@ -106,7 +106,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     final double totalLimit = provider.budgets.fold(0.0, (sum, b) => sum + b.limitAmount);
     double totalSpent = 0.0;
     for (var budget in provider.budgets) {
-      totalSpent += provider.getSpentForCategory(budget.categoryId);
+      totalSpent += provider.getSpentForCategory(budget.categoryId, targetMonth: _selectedMonth);
     }
     final double remaining = totalLimit - totalSpent;
     final double progress = totalLimit > 0 ? (totalSpent / totalLimit).clamp(0.0, 1.0) : 0.0;
@@ -418,7 +418,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                           orElse: () => provider.categories.last,
                         );
 
-                        final double spent = provider.getSpentForCategory(budget.categoryId);
+                        final double spent = provider.getSpentForCategory(budget.categoryId, targetMonth: _selectedMonth);
                         final double limit = budget.limitAmount;
                         final double progress = limit > 0 ? (spent / limit).clamp(0.0, 1.0) : 0.0;
                         final double sisa = limit - spent;

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_provider.dart';
 import '../models/category.dart';
+import '../models/recurring_transaction.dart';
 import '../main.dart';
 
 class RecurringScreen extends StatefulWidget {
@@ -13,6 +14,33 @@ class RecurringScreen extends StatefulWidget {
 }
 
 class _RecurringScreenState extends State<RecurringScreen> {
+
+  bool _isOccurringOnDate(RecurringTransaction item, DateTime date) {
+    final dateOnly = DateTime(date.year, date.month, date.day);
+    final startOnly = DateTime(item.startDate.year, item.startDate.month, item.startDate.day);
+    if (dateOnly.isBefore(startOnly)) return false;
+
+    if (item.period == 'DAILY') return true;
+    if (item.period == 'WEEKLY') return dateOnly.weekday == startOnly.weekday;
+    if (item.period == 'MONTHLY') return dateOnly.day == startOnly.day;
+    if (item.period == 'YEARLY') return dateOnly.month == startOnly.month && dateOnly.day == startOnly.day;
+
+    return false;
+  }
+
+
+  List<Map<String, dynamic>> _getSubCategories(AppProvider provider, String categoryId) {
+    final subList = provider.getSubCategoriesForCategory(categoryId);
+    if (subList.isEmpty) {
+      return [
+        {'name': 'Umum', 'icon': Icons.payments_outlined},
+        {'name': 'Pribadi', 'icon': Icons.person_outline_rounded},
+        {'name': 'Lain-lain', 'icon': Icons.more_horiz_rounded},
+      ];
+    }
+    return subList.map((name) => {'name': name, 'icon': Icons.circle_outlined}).toList();
+  }
+
   DateTime _selectedDate = DateTime(2026, 5, 19);
   DateTime _currentMonth = DateTime(2026, 5, 1);
 
@@ -136,110 +164,14 @@ class _RecurringScreenState extends State<RecurringScreen> {
     );
   }
 
-  // Dynamic interactive recurring items
-  final List<Map<String, dynamic>> _recurringItems = [
-    {
-      'id': '1',
-      'title': 'Gaji Bulanan Utama',
-      'amount': 8500000.0,
-      'isExpense': false,
-      'period': 'MONTHLY',
-      'categoryName': 'Gaji',
-      'categoryColor': const Color(0xFF00D179),
-      'categoryIcon': Icons.payments_rounded,
-      'walletName': 'Cash',
-      'day': 1,
-    },
-    {
-      'id': '2',
-      'title': 'Netflix Premium',
-      'amount': 186000.0,
-      'isExpense': true,
-      'period': 'MONTHLY',
-      'categoryName': 'Hiburan',
-      'categoryColor': const Color(0xFFEF5350),
-      'categoryIcon': Icons.movie_filter_rounded,
-      'walletName': 'Cash',
-      'day': 19,
-    },
-    {
-      'id': '3',
-      'title': 'Spotify Family Plan',
-      'amount': 86000.0,
-      'isExpense': true,
-      'period': 'MONTHLY',
-      'categoryName': 'Hiburan',
-      'categoryColor': const Color(0xFF66BB6A),
-      'categoryIcon': Icons.music_note_rounded,
-      'walletName': 'Cash',
-      'day': 19,
-    },
-  ];
 
-  void _addRecurringItem(
-    String title,
-    double amount,
-    bool isExpense,
-    String period,
-    Category category,
-    String walletName,
-    DateTime startDate,
-  ) {
-    setState(() {
-      _recurringItems.add({
-        'id': DateTime.now().toString(),
-        'title': title,
-        'amount': amount,
-        'isExpense': isExpense,
-        'period': period.toUpperCase(),
-        'categoryName': category.name,
-        'categoryColor': category.color,
-        'categoryIcon': category.icon,
-        'walletName': walletName,
-        'day': startDate.day,
-      });
-    });
-  }
 
-  void _updateRecurringItem(
-    String id,
-    String title,
-    double amount,
-    bool isExpense,
-    String period,
-    Category category,
-    String walletName,
-    DateTime startDate,
-  ) {
-    setState(() {
-      final index = _recurringItems.indexWhere((item) => item['id'] == id);
-      if (index != -1) {
-        _recurringItems[index] = {
-          'id': id,
-          'title': title,
-          'amount': amount,
-          'isExpense': isExpense,
-          'period': period.toUpperCase(),
-          'categoryName': category.name,
-          'categoryColor': category.color,
-          'categoryIcon': category.icon,
-          'walletName': walletName,
-          'day': startDate.day,
-        };
-      }
-    });
-  }
-
-  void _deleteItem(String id) {
-    setState(() {
-      _recurringItems.removeWhere((item) => item['id'] == id);
-    });
-  }
 
   // ----------------------------------------------------
   // RENDER DYNAMIC CALENDAR GRID (MATCHING SCREENSHOT 1!)
   // ----------------------------------------------------
-  Widget _buildCalendarGrid(bool isDark) {
+  Widget _buildCalendarGrid(BuildContext context, bool isDark) {
+    final provider = Provider.of<AppProvider>(context);
     final daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
     // Calculations for the calendar
@@ -299,7 +231,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
           cellDate.day == _selectedDate.day;
 
       // Check if this day has any recurring items
-      final hasItems = _recurringItems.any((item) => item['day'] == day);
+      final hasItems = provider.recurringTransactions.any((item) => _isOccurringOnDate(item, cellDate));
 
       gridCells.add(
         GestureDetector(
@@ -389,27 +321,27 @@ class _RecurringScreenState extends State<RecurringScreen> {
   // ----------------------------------------------------
   // SHOW ADD NEW RECURRING PAGE (MATCHING SCREENSHOT 2!)
   // ----------------------------------------------------
-  void _showAddRecurringPage({Map<String, dynamic>? editItem}) {
+  void _showAddRecurringPage({RecurringTransaction? editItem}) {
     final isEditing = editItem != null;
-    final titleController = TextEditingController(text: editItem?['title']);
+    final titleController = TextEditingController(text: editItem?.title);
     final amountController = TextEditingController(
-      text: editItem != null ? (editItem['amount'] as double).toStringAsFixed(0) : '',
+      text: editItem != null ? editItem.amount.toStringAsFixed(0) : '',
     );
-    bool isExpenseChoice = editItem?['isExpense'] ?? true;
+    bool isExpenseChoice = editItem?.isExpense ?? true;
     Category? selectedCategory;
+    String selectedSubCategory = editItem?.subCategory ?? '';
     String selectedFrequency = 'Monthly';
     if (editItem != null) {
-      final period = editItem['period'] as String;
-      if (period == 'DAILY') selectedFrequency = 'Daily';
-      else if (period == 'WEEKLY') selectedFrequency = 'Weekly';
-      else if (period == 'MONTHLY') selectedFrequency = 'Monthly';
-      else if (period == 'YEARLY') selectedFrequency = 'Yearly';
+      final period = editItem.period;
+      if (period == 'DAILY') { selectedFrequency = 'Daily'; }
+      else if (period == 'WEEKLY') { selectedFrequency = 'Weekly'; }
+      else if (period == 'MONTHLY') { selectedFrequency = 'Monthly'; }
+      else if (period == 'YEARLY') { selectedFrequency = 'Yearly'; }
     }
-    String selectedWallet = editItem?['walletName'] ?? 'Cash';
-    DateTime startDate = editItem != null
-        ? DateTime(2026, 5, editItem['day'] as int)
-        : DateTime(2026, 5, 19);
-    DateTime? endDate = editItem?['endDate'] as DateTime?;
+    String selectedWallet = 'Cash';
+    // Wallet will be initialized inside builder based on provider
+    DateTime startDate = editItem != null ? editItem.startDate : DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    DateTime? endDate;
 
     Navigator.push(
       context,
@@ -417,18 +349,19 @@ class _RecurringScreenState extends State<RecurringScreen> {
         builder: (context) {
           final provider = Provider.of<AppProvider>(context);
           if (editItem != null) {
-            selectedCategory = provider.categories.firstWhere(
-              (cat) => cat.name.toLowerCase() == (editItem['categoryName'] as String).toLowerCase(),
-              orElse: () => provider.categories.first,
-            );
+            selectedCategory = provider.categories.firstWhere((cat) => cat.id == editItem.categoryId, orElse: () => provider.categories.where((c) => c.isExpense == isExpenseChoice).first);
           } else {
-            selectedCategory ??= provider.categories.first;
+            selectedCategory ??= provider.categories.where((c) => c.isExpense == isExpenseChoice).first;
           }
           
           final List<String> walletNames = provider.wallets.isNotEmpty 
               ? provider.wallets.map((w) => w.name).toList()
               : ['Cash'];
               
+          if (editItem != null) {
+            final w = provider.wallets.firstWhere((w) => w.id == editItem.walletId, orElse: () => provider.wallets.first);
+            selectedWallet = w.name;
+          }
           if (!walletNames.contains(selectedWallet)) {
             selectedWallet = walletNames.first;
           }
@@ -467,26 +400,31 @@ class _RecurringScreenState extends State<RecurringScreen> {
                         final title = titleController.text;
                         final amount = double.tryParse(amountController.text) ?? 0.0;
                         if (title.isNotEmpty && amount > 0) {
+                          final wId = provider.wallets.firstWhere((w) => w.name == selectedWallet, orElse: () => provider.wallets.first).id;
                           if (isEditing) {
-                            _updateRecurringItem(
-                              editItem['id'] as String,
-                              title,
-                              amount,
-                              isExpenseChoice,
-                              selectedFrequency,
-                              selectedCategory!,
-                              selectedWallet,
-                              startDate,
+                            provider.updateRecurringTransaction(
+                              RecurringTransaction(
+                                id: editItem.id,
+                                title: title,
+                                amount: amount,
+                                isExpense: isExpenseChoice,
+                                period: selectedFrequency.toUpperCase(),
+                                categoryId: selectedCategory!.id,
+                                subCategory: selectedSubCategory,
+                                walletId: wId,
+                                startDate: startDate,
+                              )
                             );
                           } else {
-                            _addRecurringItem(
-                              title,
-                              amount,
-                              isExpenseChoice,
-                              selectedFrequency,
-                              selectedCategory!,
-                              selectedWallet,
-                              startDate,
+                            provider.addRecurringTransaction(
+                              title: title,
+                              amount: amount,
+                              isExpense: isExpenseChoice,
+                              period: selectedFrequency.toUpperCase(),
+                              categoryId: selectedCategory!.id,
+                              subCategory: selectedSubCategory,
+                              walletId: wId,
+                              startDate: startDate,
                             );
                           }
                           Navigator.pop(context);
@@ -506,7 +444,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                         children: [
                           Expanded(
                             child: GestureDetector(
-                              onTap: () => setPageState(() => isExpenseChoice = true),
+                              onTap: () => setPageState(() { isExpenseChoice = true; selectedCategory = provider.categories.where((c) => c.isExpense).first; selectedSubCategory = ''; }),
                               child: Container(
                                 alignment: Alignment.center,
                                 padding: const EdgeInsets.symmetric(vertical: 12),
@@ -528,7 +466,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: GestureDetector(
-                              onTap: () => setPageState(() => isExpenseChoice = false),
+                              onTap: () => setPageState(() { isExpenseChoice = false; selectedCategory = provider.categories.where((c) => !c.isExpense).first; selectedSubCategory = ''; }),
                               child: Container(
                                 alignment: Alignment.center,
                                 padding: const EdgeInsets.symmetric(vertical: 12),
@@ -630,7 +568,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                             value: selectedCategory,
                             dropdownColor: Theme.of(context).cardColor,
                             isExpanded: true,
-                            items: provider.categories.map((Category cat) {
+                            items: provider.categories.where((c) => c.isExpense == isExpenseChoice).map((Category cat) {
                               return DropdownMenuItem<Category>(
                                 value: cat,
                                 child: Row(
@@ -646,12 +584,76 @@ class _RecurringScreenState extends State<RecurringScreen> {
                               if (newCat != null) {
                                 setPageState(() {
                                   selectedCategory = newCat;
+                                  selectedSubCategory = '';
                                 });
                               }
                             },
                           ),
                         ),
                       ),
+                      // Sub-category Row
+                      Builder(builder: (context) {
+                        final subCategories = _getSubCategories(provider, selectedCategory!.id);
+                        if (subCategories.isEmpty) return const SizedBox();
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              height: 38,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                physics: const BouncingScrollPhysics(),
+                                itemCount: subCategories.length,
+                                itemBuilder: (context, index) {
+                                  final subCat = subCategories[index];
+                                  final isSelected = selectedSubCategory == subCat['name'];
+                                  final activeColor = selectedCategory!.color;
+                                  return GestureDetector(
+                                    onTap: () {
+                                      setPageState(() {
+                                        selectedSubCategory = subCat['name'];
+                                      });
+                                    },
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 150),
+                                      margin: const EdgeInsets.only(right: 8),
+                                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                                      decoration: BoxDecoration(
+                                        color: inputBg,
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: isSelected ? activeColor : borderCol,
+                                          width: isSelected ? 1.5 : 1,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            subCat['icon'],
+                                            color: isSelected ? activeColor : subColor,
+                                            size: 14,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            subCat['name'],
+                                            style: TextStyle(
+                                              color: isSelected ? textColor : subColor,
+                                              fontSize: 11,
+                                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+
                       const SizedBox(height: 20),
                       const SizedBox(height: 24),
 
@@ -864,24 +866,28 @@ class _RecurringScreenState extends State<RecurringScreen> {
     final subTextColor = isDark ? Colors.white.withValues(alpha: 0.45) : const Color(0xFF64748B);
     final borderColor = isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.05);
     final cardBgColor = isDark ? theme.cardColor : Colors.white;
-    final monthString = [
+    final monthString = '${[
       'January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'
-    ][_currentMonth.month - 1] + ' ' + _currentMonth.year.toString();
+    ][_currentMonth.month - 1]} ${_currentMonth.year}';
 
     // Filter recurring items for selected day
-    final dayItems = _recurringItems.where((item) => item['day'] == _selectedDate.day).toList();
+    final dayItems = provider.recurringTransactions.where((item) => _isOccurringOnDate(item, _selectedDate)).toList();
 
-    // Calculate total Monthly Commitments (Income - Expenses)
+    // Calculate total Monthly Commitments (Income - Expenses) dynamically for the viewed month
     double monthlyIncome = 0.0;
     double monthlyExpense = 0.0;
-    for (var item in _recurringItems) {
-      final amt = item['amount'] as double;
-      final isExp = item['isExpense'] as bool;
-      if (isExp) {
-        monthlyExpense += amt;
-      } else {
-        monthlyIncome += amt;
+    final daysInCurrentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1, 0).day;
+    
+    for (int day = 1; day <= daysInCurrentMonth; day++) {
+      final cellDate = DateTime(_currentMonth.year, _currentMonth.month, day);
+      final activeItemsForDay = provider.recurringTransactions.where((item) => _isOccurringOnDate(item, cellDate));
+      for (var item in activeItemsForDay) {
+        if (item.isExpense) {
+          monthlyExpense += item.amount;
+        } else {
+          monthlyIncome += item.amount;
+        }
       }
     }
 
@@ -991,7 +997,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                     const SizedBox(height: 24),
 
                     // Beautiful Month Calendar Grid
-                    _buildCalendarGrid(isDark),
+                    _buildCalendarGrid(context, isDark),
                   ],
                 ),
               ),
@@ -1029,8 +1035,10 @@ class _RecurringScreenState extends State<RecurringScreen> {
                     )
                   : Column(
                       children: dayItems.map((item) {
-                        final isExp = item['isExpense'] as bool;
-                        final categoryCol = item['categoryColor'] as Color;
+                        final isExp = item.isExpense;
+                        final cat = provider.categories.firstWhere((c) => c.id == item.categoryId, orElse: () => provider.categories.first);
+                        final wallet = provider.wallets.firstWhere((w) => w.id == item.walletId, orElse: () => provider.wallets.first);
+                        final categoryCol = cat.color;
 
                         return GestureDetector(
                           onTap: () => _showAddRecurringPage(editItem: item),
@@ -1062,7 +1070,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        item['title'] as String,
+                                        item.title,
                                         style: TextStyle(
                                           color: mainTextColor,
                                           fontWeight: FontWeight.w800,
@@ -1079,7 +1087,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                                               borderRadius: BorderRadius.circular(4),
                                             ),
                                             child: Text(
-                                              item['period'] as String,
+                                              item.period,
                                               style: TextStyle(color: subTextColor, fontSize: 8, fontWeight: FontWeight.w800),
                                             ),
                                           ),
@@ -1087,14 +1095,14 @@ class _RecurringScreenState extends State<RecurringScreen> {
                                           Icon(Icons.wallet_rounded, size: 10, color: subTextColor),
                                           const SizedBox(width: 2),
                                           Text(
-                                            item['walletName'] as String,
+                                            wallet.name,
                                             style: TextStyle(color: subTextColor, fontSize: 10, fontWeight: FontWeight.w500),
                                           ),
                                           const SizedBox(width: 6),
-                                          Icon(item['categoryIcon'] as IconData, size: 10, color: categoryCol),
+                                          Icon(cat.icon, size: 10, color: categoryCol),
                                           const SizedBox(width: 2),
                                           Text(
-                                            item['categoryName'] as String,
+                                            cat.name + (item.subCategory.isNotEmpty ? ' > ${item.subCategory}' : ''),
                                             style: TextStyle(color: categoryCol, fontSize: 10, fontWeight: FontWeight.bold),
                                           ),
                                         ],
@@ -1106,7 +1114,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(
-                                      AppLocale.formatCurrency(item['amount'] as double, '${isExp ? "-" : "+"} $currency '),
+                                      AppLocale.formatCurrency(item.amount, '${isExp ? "-" : "+"} $currency '),
                                       style: TextStyle(
                                         color: isExp ? const Color(0xFFEF5350) : const Color(0xFF00D179),
                                         fontWeight: FontWeight.w800,
@@ -1116,7 +1124,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                                     ),
                                     const SizedBox(height: 4),
                                     GestureDetector(
-                                      onTap: () => _deleteItem(item['id'] as String),
+                                      onTap: () => provider.deleteRecurringTransaction(item.id),
                                       child: Text(
                                         'Hapus',
                                         style: TextStyle(

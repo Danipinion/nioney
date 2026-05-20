@@ -6,11 +6,13 @@ import '../models/category.dart';
 import '../models/wallet.dart';
 import '../models/transaction.dart';
 import '../models/budget.dart';
+import '../models/recurring_transaction.dart';
 
 class AppProvider with ChangeNotifier {
   static const String _prefTransactionsKey = 'nioney_transactions';
   static const String _prefWalletsKey = 'nioney_wallets';
   static const String _prefBudgetsKey = 'nioney_budgets';
+  static const String _prefRecurringKey = 'nioney_recurring';
   static const String _prefThemeModeKey = 'nioney_theme_mode';
   static const String _prefPaletteKey = 'nioney_palette';
   static const String _prefCurrencyKey = 'nioney_currency';
@@ -24,6 +26,7 @@ class AppProvider with ChangeNotifier {
   List<Wallet> _wallets = [];
   List<Transaction> _transactions = [];
   List<Budget> _budgets = [];
+  List<RecurringTransaction> _recurringTransactions = [];
 
   ThemeMode _themeMode = ThemeMode.dark;
   String _currentPalette = 'Obsidian Mint';
@@ -35,6 +38,7 @@ class AppProvider with ChangeNotifier {
   List<Wallet> get wallets => _wallets;
   List<Transaction> get transactions => _transactions;
   List<Budget> get budgets => _budgets;
+  List<RecurringTransaction> get recurringTransactions => _recurringTransactions;
   ThemeMode get themeMode => _themeMode;
   String get currentPalette => _currentPalette;
   String get currencySymbol => _currencySymbol;
@@ -187,6 +191,19 @@ class AppProvider with ChangeNotifier {
       _budgets = [];
     }
 
+    // 7. Load Recurring Transactions
+    final recurringJson = prefs.getString(_prefRecurringKey);
+    if (recurringJson != null) {
+      try {
+        final List<dynamic> decoded = jsonDecode(recurringJson);
+        _recurringTransactions = decoded.map((r) => RecurringTransaction.fromJson(r)).toList();
+      } catch (e) {
+        _recurringTransactions = [];
+      }
+    } else {
+      _recurringTransactions = [];
+    }
+
     notifyListeners();
   }
 
@@ -213,6 +230,14 @@ class AppProvider with ChangeNotifier {
         .map((b) => _budgetToJson(b))
         .toList();
     await prefs.setString(_prefBudgetsKey, jsonEncode(encoded));
+  }
+
+  Future<void> _saveRecurringTransactions() async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<Map<String, dynamic>> encoded = _recurringTransactions
+        .map((r) => r.toJson())
+        .toList();
+    await prefs.setString(_prefRecurringKey, jsonEncode(encoded));
   }
 
   // Setters & Actions
@@ -354,6 +379,48 @@ class AppProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Recurring Transaction Operations
+  Future<void> addRecurringTransaction({
+    required String title,
+    required double amount,
+    required bool isExpense,
+    required String period,
+    required String categoryId,
+    String subCategory = '',
+    required String walletId,
+    required DateTime startDate,
+  }) async {
+    final r = RecurringTransaction(
+      id: 'recurring_${_uuid.v4()}',
+      title: title,
+      amount: amount,
+      isExpense: isExpense,
+      period: period,
+      categoryId: categoryId,
+      subCategory: subCategory,
+      walletId: walletId,
+      startDate: startDate,
+    );
+    _recurringTransactions.add(r);
+    await _saveRecurringTransactions();
+    notifyListeners();
+  }
+
+  Future<void> updateRecurringTransaction(RecurringTransaction updated) async {
+    final index = _recurringTransactions.indexWhere((r) => r.id == updated.id);
+    if (index != -1) {
+      _recurringTransactions[index] = updated;
+      await _saveRecurringTransactions();
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteRecurringTransaction(String id) async {
+    _recurringTransactions.removeWhere((r) => r.id == id);
+    await _saveRecurringTransactions();
+    notifyListeners();
+  }
+
   // Utility Calculations
   void _updateWalletBalance(String walletId, double difference) {
     final index = _wallets.indexWhere((w) => w.id == walletId);
@@ -399,14 +466,14 @@ class AppProvider with ChangeNotifier {
   }
 
   // Dynamic budget spent derivation
-  double getSpentForCategory(String categoryId) {
-    final now = DateTime.now();
+  double getSpentForCategory(String categoryId, {DateTime? targetMonth}) {
+    final month = targetMonth ?? DateTime.now();
     double total = 0.0;
     for (var tx in _transactions) {
       if (tx.isExpense &&
           tx.categoryId == categoryId &&
-          tx.date.month == now.month &&
-          tx.date.year == now.year) {
+          tx.date.month == month.month &&
+          tx.date.year == month.year) {
         total += tx.amount;
       }
     }
