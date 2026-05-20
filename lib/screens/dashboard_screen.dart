@@ -92,6 +92,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     double displayExpense = 0.0;
 
     for (var tx in filteredTransactions) {
+      if (tx.categoryId == 'sys_transfer') continue; // Exclude Transfer
       if (tx.isExpense) {
         displayExpense += tx.amount;
       } else {

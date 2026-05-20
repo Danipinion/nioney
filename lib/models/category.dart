@@ -87,5 +87,12 @@ class Category {
       color: Color(0xFF8D6E63), // Cocoa Brown
       isExpense: true,
     ),
+    const Category(
+      id: 'sys_transfer',
+      name: 'Transfer',
+      icon: Icons.swap_horiz_rounded,
+      color: Color(0xFF9E9E9E), // Grey
+      isExpense: true,
+    ),
   ];
 }

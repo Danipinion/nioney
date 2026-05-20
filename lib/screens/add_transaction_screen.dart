@@ -299,7 +299,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         title: sourceTitle,
         amount: parsedAmount,
         isExpense: true,
-        categoryId: 'other_expense',
+        categoryId: 'sys_transfer',
         walletId: _selectedWalletId!,
         date: _selectedDate,
         note: noteText,
@@ -309,7 +309,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         title: destTitle,
         amount: parsedAmount,
         isExpense: false,
-        categoryId: 'other_income',
+        categoryId: 'sys_transfer',
         walletId: _destinationWalletId!,
         date: _selectedDate,
         note: noteText,
@@ -704,7 +704,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     final inputBg = isDark ? const Color(0xFF1E293B) : Colors.white;
 
     final filteredCategories = provider.categories
-        .where((c) => c.isExpense == (_transactionTypeIndex == 0 || _transactionTypeIndex == 2))
+        .where((c) => c.isExpense == (_transactionTypeIndex == 0 || _transactionTypeIndex == 2) && !c.id.startsWith('sys_'))
         .toList();
 
     final activeMainCategory = filteredCategories.firstWhere(

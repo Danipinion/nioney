@@ -107,6 +107,7 @@ class AppProvider with ChangeNotifier {
         if (!_categories.any((c) => c.id == 'social') || 
             !_categories.any((c) => c.id == 'financial') ||
             !_categories.any((c) => c.id == 'business') ||
+            !_categories.any((c) => c.id == 'sys_transfer') ||
             !_categories.any((c) => c.id == 'gift')) {
           needsForceDefaults = true;
         }
@@ -444,6 +445,7 @@ class AppProvider with ChangeNotifier {
     double total = 0.0;
     for (var tx in _transactions) {
       if (!tx.isExpense &&
+          tx.categoryId != 'sys_transfer' &&
           tx.date.month == now.month &&
           tx.date.year == now.year) {
         total += tx.amount;
@@ -457,6 +459,7 @@ class AppProvider with ChangeNotifier {
     double total = 0.0;
     for (var tx in _transactions) {
       if (tx.isExpense &&
+          tx.categoryId != 'sys_transfer' &&
           tx.date.month == now.month &&
           tx.date.year == now.year) {
         total += tx.amount;
@@ -471,6 +474,7 @@ class AppProvider with ChangeNotifier {
     double total = 0.0;
     for (var tx in _transactions) {
       if (tx.isExpense &&
+          tx.categoryId != 'sys_transfer' &&
           tx.categoryId == categoryId &&
           tx.date.month == month.month &&
           tx.date.year == month.year) {
@@ -487,6 +491,7 @@ class AppProvider with ChangeNotifier {
 
     for (var tx in _transactions) {
       if (tx.isExpense &&
+          tx.categoryId != 'sys_transfer' &&
           tx.date.month == now.month &&
           tx.date.year == now.year) {
         final cat = _categories.firstWhere(
