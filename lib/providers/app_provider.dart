@@ -7,6 +7,7 @@ import '../models/wallet.dart';
 import '../models/transaction.dart';
 import '../models/budget.dart';
 import '../models/recurring_transaction.dart';
+import '../models/savings_target.dart';
 
 class AppProvider with ChangeNotifier {
   static const String _prefTransactionsKey = 'nioney_transactions';
@@ -18,6 +19,7 @@ class AppProvider with ChangeNotifier {
   static const String _prefCurrencyKey = 'nioney_currency';
   static const String _prefCategoriesKey = 'nioney_categories';
   static const String _prefSubCategoriesKey = 'nioney_subcategories';
+  static const String _prefSavingsTargetsKey = 'nioney_savings_targets';
 
   final _uuid = const Uuid();
 
@@ -27,6 +29,7 @@ class AppProvider with ChangeNotifier {
   List<Transaction> _transactions = [];
   List<Budget> _budgets = [];
   List<RecurringTransaction> _recurringTransactions = [];
+  List<SavingsTarget> _savingsTargets = [];
 
   ThemeMode _themeMode = ThemeMode.dark;
   String _currentPalette = 'Deep Sapphire';
@@ -39,6 +42,7 @@ class AppProvider with ChangeNotifier {
   List<Transaction> get transactions => _transactions;
   List<Budget> get budgets => _budgets;
   List<RecurringTransaction> get recurringTransactions => _recurringTransactions;
+  List<SavingsTarget> get savingsTargets => _savingsTargets;
   ThemeMode get themeMode => _themeMode;
   String get currentPalette => _currentPalette;
   String get currencySymbol => _currencySymbol;
@@ -70,6 +74,9 @@ class AppProvider with ChangeNotifier {
       const Category(id: 'gift', name: 'Hadiah', icon: Icons.card_giftcard_rounded, color: Color(0xFFEC407A), isExpense: false),
       const Category(id: 'other_income', name: 'Pemasukan Lain', icon: Icons.savings_rounded, color: Color(0xFF78909C), isExpense: false),
       const Category(id: 'sys_transfer', name: 'Transfer', icon: Icons.swap_horiz_rounded, color: Color(0xFF9E9E9E), isExpense: true),
+      const Category(id: 'sys_saving_target', name: 'Target Tabungan', icon: Icons.track_changes_rounded, color: Color(0xFF00D179), isExpense: true),
+      const Category(id: 'sys_debt', name: 'Hutang Piutang', icon: Icons.account_balance_wallet_rounded, color: Colors.deepOrange, isExpense: true),
+      const Category(id: 'sys_reimburse', name: 'Reimburse', icon: Icons.handshake_rounded, color: Colors.orange, isExpense: true),
     ];
   }
 
@@ -109,6 +116,7 @@ class AppProvider with ChangeNotifier {
             !_categories.any((c) => c.id == 'financial') ||
             !_categories.any((c) => c.id == 'business') ||
             !_categories.any((c) => c.id == 'sys_transfer') ||
+            !_categories.any((c) => c.id == 'sys_saving_target') ||
             !_categories.any((c) => c.id == 'gift')) {
           needsForceDefaults = true;
         }
@@ -204,6 +212,19 @@ class AppProvider with ChangeNotifier {
       }
     } else {
       _recurringTransactions = [];
+    }
+
+    // 8. Load Savings Targets
+    final savingsJson = prefs.getString(_prefSavingsTargetsKey);
+    if (savingsJson != null) {
+      try {
+        final List<dynamic> decoded = jsonDecode(savingsJson);
+        _savingsTargets = decoded.map((s) => _savingsTargetFromJson(s)).toList();
+      } catch (e) {
+        _savingsTargets = [];
+      }
+    } else {
+      _savingsTargets = [];
     }
 
     notifyListeners();
@@ -684,5 +705,149 @@ class AppProvider with ChangeNotifier {
       'color': c.color.toARGB32(),
       'isExpense': c.isExpense,
     };
+  }
+
+  // Savings Targets Methods
+  Future<void> _saveSavingsTargets() async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<Map<String, dynamic>> encoded = _savingsTargets
+        .map((s) => _savingsTargetToJson(s))
+        .toList();
+    await prefs.setString(_prefSavingsTargetsKey, jsonEncode(encoded));
+  }
+
+  SavingsTarget _savingsTargetFromJson(Map<String, dynamic> json) {
+    return SavingsTarget(
+      id: json['id'],
+      title: json['title'],
+      targetAmount: (json['targetAmount'] as num).toDouble(),
+      savedAmount: (json['savedAmount'] as num).toDouble(),
+      targetDate: json['targetDate'] != null ? DateTime.parse(json['targetDate']) : null,
+      color: Color(json['color'] as int),
+      icon: IconData(json['icon'] as int, fontFamily: 'MaterialIcons'),
+    );
+  }
+
+  Map<String, dynamic> _savingsTargetToJson(SavingsTarget t) {
+    return {
+      'id': t.id,
+      'title': t.title,
+      'targetAmount': t.targetAmount,
+      'savedAmount': t.savedAmount,
+      'targetDate': t.targetDate?.toIso8601String(),
+      'color': t.color.toARGB32(),
+      'icon': t.icon.codePoint,
+    };
+  }
+
+  Future<void> addSavingsTarget({
+    required String title,
+    required double targetAmount,
+    DateTime? targetDate,
+    required Color color,
+    required IconData icon,
+  }) async {
+    final newTarget = SavingsTarget(
+      id: _uuid.v4(),
+      title: title,
+      targetAmount: targetAmount,
+      savedAmount: 0.0,
+      targetDate: targetDate,
+      color: color,
+      icon: icon,
+    );
+    _savingsTargets.add(newTarget);
+    notifyListeners();
+    await _saveSavingsTargets();
+  }
+
+  Future<void> deleteSavingsTarget(String id) async {
+    _savingsTargets.removeWhere((t) => t.id == id);
+    notifyListeners();
+    await _saveSavingsTargets();
+  }
+
+  Future<void> depositToSavingsTarget({
+    required String targetId,
+    required double amount,
+    required String walletId,
+  }) async {
+    final targetIndex = _savingsTargets.indexWhere((t) => t.id == targetId);
+    final walletIndex = _wallets.indexWhere((w) => w.id == walletId);
+    if (targetIndex == -1 || walletIndex == -1) return;
+
+    final target = _savingsTargets[targetIndex];
+    final wallet = _wallets[walletIndex];
+
+    // Deduct from wallet balance
+    final updatedWallet = wallet.copyWith(balance: wallet.balance - amount);
+    _wallets[walletIndex] = updatedWallet;
+
+    // Add to savings target
+    final updatedTarget = target.copyWith(savedAmount: target.savedAmount + amount);
+    _savingsTargets[targetIndex] = updatedTarget;
+
+    // Create a transaction
+    final newTx = Transaction(
+      id: _uuid.v4(),
+      title: 'Setor: ${target.title}',
+      amount: amount,
+      isExpense: true,
+      categoryId: 'sys_saving_target',
+      subCategory: target.title,
+      walletId: walletId,
+      date: DateTime.now(),
+      note: 'Menabung untuk target: ${target.title}',
+    );
+    _transactions.insert(0, newTx);
+
+    notifyListeners();
+    await _saveWallets();
+    await _saveSavingsTargets();
+    await _saveTransactions();
+  }
+
+  Future<void> withdrawFromSavingsTarget({
+    required String targetId,
+    required double amount,
+    required String walletId,
+  }) async {
+    final targetIndex = _savingsTargets.indexWhere((t) => t.id == targetId);
+    final walletIndex = _wallets.indexWhere((w) => w.id == walletId);
+    if (targetIndex == -1 || walletIndex == -1) return;
+
+    final target = _savingsTargets[targetIndex];
+    final wallet = _wallets[walletIndex];
+
+    // Withdraw amount cannot exceed saved amount
+    final withdrawAmount = amount.clamp(0.0, target.savedAmount);
+    if (withdrawAmount <= 0) return;
+
+    // Add back to wallet balance
+    final updatedWallet = wallet.copyWith(balance: wallet.balance + withdrawAmount);
+    _wallets[walletIndex] = updatedWallet;
+
+    // Deduct from savings target
+    final updatedTarget = target.copyWith(savedAmount: target.savedAmount - withdrawAmount);
+    _savingsTargets[targetIndex] = updatedTarget;
+
+    // Create an income transaction
+    final newTx = Transaction(
+      id: _uuid.v4(),
+      title: 'Tarik: ${target.title}',
+      amount: withdrawAmount,
+      isExpense: false,
+      categoryId: 'sys_saving_target',
+      subCategory: target.title,
+      walletId: walletId,
+      date: DateTime.now(),
+      note: 'Penarikan dari target: ${target.title}',
+    );
+    _transactions.insert(0, newTx);
+
+    notifyListeners();
+    await _saveWallets();
+    await _saveSavingsTargets();
+    await _saveTransactions();
   }
 }

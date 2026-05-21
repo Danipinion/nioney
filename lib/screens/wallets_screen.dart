@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/app_provider.dart';
 import '../models/wallet.dart';
+import '../models/savings_target.dart';
+import 'savings_targets_screen.dart';
 
 class WalletsScreen extends StatelessWidget {
   const WalletsScreen({super.key});
@@ -32,6 +34,7 @@ class WalletsScreen extends StatelessWidget {
 
     // Calculate totals
     double totalBalance = provider.wallets.fold(0, (sum, w) => sum + w.balance);
+    double totalSavings = provider.savingsTargets.fold(0.0, (sum, t) => sum + t.savedAmount);
     final formatter = NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp',
@@ -211,7 +214,7 @@ class WalletsScreen extends StatelessWidget {
                             Expanded(
                               child: _buildMiniStatCard(
                                 'Tabungan Aktif',
-                                formatter.format(0),
+                                formatter.format(totalSavings),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -279,6 +282,15 @@ class WalletsScreen extends StatelessWidget {
             _buildWalletSection(
               'Kartu Kredit',
               'Credit Card',
+              provider,
+              cardBg,
+              textColor,
+              subTextColor,
+              borderCol,
+              formatter,
+              context,
+            ),
+            _buildSavingsSection(
               provider,
               cardBg,
               textColor,
@@ -537,6 +549,216 @@ class WalletsScreen extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildSavingsSection(
+    AppProvider provider,
+    Color cardBg,
+    Color textColor,
+    Color subTextColor,
+    Color borderCol,
+    NumberFormat formatter,
+    BuildContext context,
+  ) {
+    final targets = provider.savingsTargets;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Tabungan & Celengan',
+              style: TextStyle(
+                color: textColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SavingsTargetsScreen()),
+                );
+              },
+              child: Text(
+                'Lihat Semua',
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (targets.isEmpty)
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.only(bottom: 24),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: cardBg,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: borderCol),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: subTextColor.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.savings_rounded,
+                    color: subTextColor,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Belum ada target tabungan',
+                        style: TextStyle(
+                          color: subTextColor,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Ketuk "Lihat Semua" untuk membuat celengan pertama Anda.',
+                        style: TextStyle(
+                          color: subTextColor.withValues(alpha: 0.6),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          )
+        else
+          Column(
+            children: targets.map((target) {
+              final isAchieved = target.isAchieved;
+              final progress = target.targetAmount > 0 ? (target.savedAmount / target.targetAmount).clamp(0.0, 1.0) : 0.0;
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  color: cardBg,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: borderCol),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SavingsTargetsScreen()),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: target.color.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              target.icon,
+                              color: target.color,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        target.title,
+                                        style: TextStyle(
+                                          color: textColor,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: isAchieved
+                                            ? const Color(0xFF00D179).withValues(alpha: 0.12)
+                                            : Colors.amber.withValues(alpha: 0.12),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        isAchieved ? 'Tercapai' : 'Belum Tercapai',
+                                        style: TextStyle(
+                                          color: isAchieved ? const Color(0xFF00D179) : Colors.amber,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: LinearProgressIndicator(
+                                    value: progress,
+                                    backgroundColor: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.04),
+                                    valueColor: AlwaysStoppedAnimation<Color>(isAchieved ? const Color(0xFF00D179) : target.color),
+                                    minHeight: 4,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Terkumpul: ${formatter.format(target.savedAmount)} dari ${formatter.format(target.targetAmount)} (${(progress * 100).toStringAsFixed(0)}%)',
+                                  style: TextStyle(
+                                    color: subTextColor,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        if (targets.isNotEmpty) const SizedBox(height: 12),
+      ],
     );
   }
 }
