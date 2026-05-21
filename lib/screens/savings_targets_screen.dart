@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../providers/app_provider.dart';
 import '../models/savings_target.dart';
 import '../main.dart';
+import 'savings_target_detail_screen.dart';
 
 class SavingsTargetsScreen extends StatefulWidget {
   const SavingsTargetsScreen({super.key});
@@ -320,328 +321,7 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
     );
   }
 
-  void _showDepositWithdrawSheet(SavingsTarget target) {
-    final amountController = TextEditingController();
-    bool isDeposit = true; // Setor vs Tarik
-    String? selectedWalletId;
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setSheetState) {
-            final provider = Provider.of<AppProvider>(context);
-            final isDark = Theme.of(context).brightness == Brightness.dark;
-            final sheetBg = isDark ? const Color(0xFF0F172A) : Colors.white;
-            final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
-            final subColor = isDark ? Colors.white54 : Colors.black54;
-            final currency = provider.currencySymbol;
-
-            if (selectedWalletId == null && provider.wallets.isNotEmpty) {
-              selectedWalletId = provider.wallets.first.id;
-            }
-
-            return Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: sheetBg,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                ),
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 36,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: isDark ? Colors.white24 : Colors.black12,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Kelola Celengan',
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        fontFamily: 'Outfit',
-                      ),
-                    ),
-                    Text(
-                      target.title,
-                      style: TextStyle(
-                        color: subColor,
-                        fontSize: 12,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Deposit / Withdraw Switch
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => setSheetState(() => isDeposit = true),
-                            child: Container(
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              decoration: BoxDecoration(
-                                color: isDeposit
-                                    ? const Color(0xFF00D179).withValues(alpha: 0.12)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: isDeposit ? const Color(0xFF00D179) : Colors.transparent,
-                                  width: 1.5,
-                                ),
-                              ),
-                              child: Text(
-                                'Setor Tabungan',
-                                style: TextStyle(
-                                  color: isDeposit ? const Color(0xFF00D179) : subColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => setSheetState(() => isDeposit = false),
-                            child: Container(
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              decoration: BoxDecoration(
-                                color: !isDeposit
-                                    ? Colors.redAccent.withValues(alpha: 0.12)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: !isDeposit ? Colors.redAccent : Colors.transparent,
-                                  width: 1.5,
-                                ),
-                              ),
-                              child: Text(
-                                'Tarik Uang',
-                                style: TextStyle(
-                                  color: !isDeposit ? Colors.redAccent : subColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Wallet Dropdown Selector
-                    Text(
-                      isDeposit ? 'Dompet Sumber (Potong Saldo)' : 'Dompet Tujuan (Masuk Saldo)',
-                      style: TextStyle(color: subColor, fontSize: 11, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 6),
-                    DropdownButtonFormField<String>(
-                      value: selectedWalletId,
-                      dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-                      style: TextStyle(color: textColor, fontSize: 13),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.015),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      ),
-                      items: provider.wallets.map((w) {
-                        return DropdownMenuItem<String>(
-                          value: w.id,
-                          child: Row(
-                            children: [
-                              Icon(w.icon, color: w.color, size: 16),
-                              const SizedBox(width: 8),
-                              Text(w.name, style: TextStyle(color: textColor, fontSize: 13)),
-                              const SizedBox(width: 4),
-                              Text(
-                                '(${AppLocale.formatCurrency(w.balance, '$currency ')})',
-                                style: TextStyle(color: subColor, fontSize: 10),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
-                        setSheetState(() {
-                          selectedWalletId = val;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Amount Input
-                    TextField(
-                      controller: amountController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      decoration: InputDecoration(
-                        labelText: 'Jumlah Uang',
-                        labelStyle: TextStyle(color: subColor, fontSize: 13),
-                        filled: true,
-                        fillColor: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.015),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                      ),
-                      style: TextStyle(color: textColor, fontSize: 14),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Action Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isDeposit ? const Color(0xFF00D179) : Colors.redAccent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        onPressed: () {
-                          final amount = double.tryParse(amountController.text) ?? 0.0;
-                          if (amount <= 0) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Masukkan jumlah uang yang valid!')),
-                            );
-                            return;
-                          }
-                          if (selectedWalletId == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Pilih dompet terlebih dahulu!')),
-                            );
-                            return;
-                          }
-
-                          if (isDeposit) {
-                            // Check wallet balance
-                            final wallet = provider.wallets.firstWhere((w) => w.id == selectedWalletId);
-                            if (wallet.balance < amount) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Peringatan: Saldo dompet tidak mencukupi, tetapi transaksi tetap dicatat.'),
-                                  backgroundColor: Colors.amber,
-                                ),
-                              );
-                            }
-
-                            provider.depositToSavingsTarget(
-                              targetId: target.id,
-                              amount: amount,
-                              walletId: selectedWalletId!,
-                            );
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Berhasil menyetor ${AppLocale.formatCurrency(amount, '$currency ')}!'),
-                                backgroundColor: const Color(0xFF00D179),
-                              ),
-                            );
-                          } else {
-                            // Withdraw check: cannot exceed target saved amount
-                            if (amount > target.savedAmount) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Jumlah penarikan melebihi dana terkumpul (${AppLocale.formatCurrency(target.savedAmount, '$currency ')})!'),
-                                  backgroundColor: Colors.redAccent,
-                                ),
-                              );
-                              return;
-                            }
-
-                            provider.withdrawFromSavingsTarget(
-                              targetId: target.id,
-                              amount: amount,
-                              walletId: selectedWalletId!,
-                            );
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Berhasil menarik ${AppLocale.formatCurrency(amount, '$currency ')}!'),
-                                backgroundColor: Colors.teal,
-                              ),
-                            );
-                          }
-                        },
-                        child: Text(
-                          isDeposit ? 'Konfirmasi Setor' : 'Konfirmasi Tarik',
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _showDeleteConfirm(SavingsTarget target) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        final isDark = Theme.of(context).brightness == Brightness.dark;
-        final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
-        final subColor = isDark ? Colors.white70 : const Color(0xFF64748B);
-
-        return AlertDialog(
-          backgroundColor: Theme.of(context).cardColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          title: Text(
-            'Hapus Celengan?',
-            style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-          content: Text(
-            'Apakah Anda yakin ingin menghapus celengan "${target.title}"? Riwayat setoran tidak akan dihapus, tetapi catatan target tabungan ini akan hilang.',
-            style: TextStyle(color: subColor, fontSize: 12),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Batal', style: TextStyle(color: subColor)),
-            ),
-            TextButton(
-              onPressed: () {
-                Provider.of<AppProvider>(context, listen: false).deleteSavingsTarget(target.id);
-                Navigator.pop(context);
-              },
-              child: const Text('Hapus', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -799,142 +479,135 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
 
                         return Container(
                           margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: cardBgColor,
-                            borderRadius: BorderRadius.circular(12), // clean / less rounded
+                            borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: borderColor),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: color.withValues(alpha: 0.12),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Icon(
-                                      t.icon,
-                                      color: color,
-                                      size: 18,
-                                    ),
+                          child: Material(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(12),
+                            clipBehavior: Clip.antiAlias,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => SavingsTargetDetailScreen(targetId: t.id),
                                   ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                );
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
                                       children: [
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                t.title,
-                                                style: TextStyle(
-                                                  color: mainTextColor,
-                                                  fontWeight: FontWeight.w800,
-                                                  fontSize: 13,
-                                                ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                            if (isFinished)
-                                              Container(
-                                                margin: const EdgeInsets.only(left: 6),
-                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                decoration: BoxDecoration(
-                                                  color: const Color(0xFF00D179).withValues(alpha: 0.12),
-                                                  borderRadius: BorderRadius.circular(4),
-                                                ),
-                                                child: const Text(
-                                                  'Tercapai',
-                                                  style: TextStyle(color: Color(0xFF00D179), fontSize: 9, fontWeight: FontWeight.bold),
-                                                ),
-                                              ),
-                                          ],
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: color.withValues(alpha: 0.12),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Icon(
+                                            t.icon,
+                                            color: color,
+                                            size: 18,
+                                          ),
                                         ),
-                                        const SizedBox(height: 2),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      t.title,
+                                                      style: TextStyle(
+                                                        color: mainTextColor,
+                                                        fontWeight: FontWeight.w800,
+                                                        fontSize: 13,
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                  if (isFinished)
+                                                    Container(
+                                                      margin: const EdgeInsets.only(left: 6),
+                                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(0xFF00D179).withValues(alpha: 0.12),
+                                                        borderRadius: BorderRadius.circular(4),
+                                                      ),
+                                                      child: const Text(
+                                                        'Tercapai',
+                                                        style: TextStyle(color: Color(0xFF00D179), fontSize: 9, fontWeight: FontWeight.bold),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 2),
+                                              Text(
+                                                t.targetDate != null
+                                                    ? 'Target: ${DateFormat('dd MMM yyyy').format(t.targetDate!)}'
+                                                    : 'Tanpa Batas Tanggal',
+                                                style: TextStyle(
+                                                  color: subTextColor,
+                                                  fontSize: 11,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Icon(
+                                          Icons.arrow_forward_ios_rounded,
+                                          color: subTextColor.withValues(alpha: 0.3),
+                                          size: 12,
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
                                         Text(
-                                          t.targetDate != null
-                                              ? 'Target: ${DateFormat('dd MMM yyyy').format(t.targetDate!)}'
-                                              : 'Tanpa Batas Tanggal',
+                                          '${AppLocale.formatCurrency(saved, '$currency ')} / ${AppLocale.formatCurrency(target, '$currency ')}',
                                           style: TextStyle(
-                                            color: subTextColor,
+                                            color: mainTextColor,
                                             fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                            fontFamily: 'Outfit',
+                                          ),
+                                        ),
+                                        Text(
+                                          '${(progress * 100).toStringAsFixed(0)}%',
+                                          style: TextStyle(
+                                            color: isFinished ? const Color(0xFF00D179) : color,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w800,
+                                            fontFamily: 'Outfit',
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                  IconButton(
-                                    onPressed: () => _showDeleteConfirm(t),
-                                    icon: Icon(
-                                      Icons.delete_outline_rounded,
-                                      color: subTextColor.withValues(alpha: 0.4),
-                                      size: 18,
+                                    const SizedBox(height: 8),
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(4),
+                                      child: LinearProgressIndicator(
+                                        value: progress,
+                                        backgroundColor: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.04),
+                                        valueColor: AlwaysStoppedAnimation<Color>(isFinished ? const Color(0xFF00D179) : color),
+                                        minHeight: 5,
+                                      ),
                                     ),
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    '${AppLocale.formatCurrency(saved, '$currency ')} / ${AppLocale.formatCurrency(target, '$currency ')}',
-                                    style: TextStyle(
-                                      color: mainTextColor,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w700,
-                                      fontFamily: 'Outfit',
-                                    ),
-                                  ),
-                                  Text(
-                                    '${(progress * 100).toStringAsFixed(0)}%',
-                                    style: TextStyle(
-                                      color: isFinished ? const Color(0xFF00D179) : color,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w800,
-                                      fontFamily: 'Outfit',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(4),
-                                child: LinearProgressIndicator(
-                                  value: progress,
-                                  backgroundColor: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.04),
-                                  valueColor: AlwaysStoppedAnimation<Color>(isFinished ? const Color(0xFF00D179) : color),
-                                  minHeight: 5,
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 12),
-                              SizedBox(
-                                width: double.infinity,
-                                height: 32,
-                                child: OutlinedButton(
-                                  style: OutlinedButton.styleFrom(
-                                    side: BorderSide(color: color.withValues(alpha: 0.3)),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    padding: EdgeInsets.zero,
-                                  ),
-                                  onPressed: () => _showDepositWithdrawSheet(t),
-                                  child: Text(
-                                    'Setor / Tarik Dana',
-                                    style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 11),
-                                  ),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         );
                       }).toList(),

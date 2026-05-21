@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/app_provider.dart';
 import '../models/wallet.dart';
+import '../models/savings_target.dart';
+import 'savings_target_detail_screen.dart';
 import '../widgets/transaction_item.dart';
 import 'add_transaction_screen.dart';
 import 'transactions_screen.dart';
@@ -845,10 +847,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 12),
 
               // Wallet dynamic cards (Cash and Emas styles)
-              provider.wallets.isEmpty
+              // Wallet dynamic cards (Cash and Emas styles)
+              (provider.wallets.isEmpty && provider.savingsTargets.isEmpty)
                   ? Center(
                       child: Text(
-                        'Belum ada dompet.',
+                        'Belum ada dompet atau celengan.',
                         style: TextStyle(color: subTextColor),
                       ),
                     )
@@ -857,23 +860,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         physics: const BouncingScrollPhysics(),
-                        itemCount: provider.wallets.length,
+                        itemCount: provider.wallets.length + provider.savingsTargets.length,
                         itemBuilder: (context, index) {
-                          final wallet = provider.wallets[index];
+                          final isWallet = index < provider.wallets.length;
+                          final totalCount = provider.wallets.length + provider.savingsTargets.length;
+                          
                           return Container(
                             width: 160,
                             margin: EdgeInsets.only(
-                              right: index == provider.wallets.length - 1 ? 0 : 12,
+                              right: index == totalCount - 1 ? 0 : 12,
                             ),
-                            child: _buildCustomWalletCard(
-                              context,
-                              wallet,
-                              cardBgColor,
-                              borderColor,
-                              mainTextColor,
-                              subTextColor,
-                              numberFormat,
-                            ),
+                            child: isWallet
+                                ? _buildCustomWalletCard(
+                                    context,
+                                    provider.wallets[index],
+                                    cardBgColor,
+                                    borderColor,
+                                    mainTextColor,
+                                    subTextColor,
+                                    numberFormat,
+                                  )
+                                : GestureDetector(
+                                    onTap: () {
+                                      final target = provider.savingsTargets[index - provider.wallets.length];
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => SavingsTargetDetailScreen(targetId: target.id),
+                                        ),
+                                      );
+                                    },
+                                    child: _buildSavingsTargetWalletCard(
+                                      context,
+                                      provider.savingsTargets[index - provider.wallets.length],
+                                      cardBgColor,
+                                      borderColor,
+                                      mainTextColor,
+                                      subTextColor,
+                                      numberFormat,
+                                    ),
+                                  ),
                           );
                         },
                       ),
@@ -1166,6 +1192,93 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 2),
               Text(
                 format.format(wallet.balance),
+                style: TextStyle(
+                  color: mainTextColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  fontFamily: 'Outfit',
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSavingsTargetWalletCard(
+    BuildContext context,
+    SavingsTarget target,
+    Color cardBgColor,
+    Color borderColor,
+    Color mainTextColor,
+    Color subTextColor,
+    NumberFormat format,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: cardBgColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: target.color.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(target.icon, color: target.color, size: 16),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  target.title,
+                  style: TextStyle(
+                    color: mainTextColor,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'CELENGAN • IDR',
+                    style: TextStyle(
+                      color: subTextColor.withValues(alpha: 0.6),
+                      fontSize: 9,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  Text(
+                    '${((target.targetAmount > 0 ? (target.savedAmount / target.targetAmount) : 0.0) * 100).toStringAsFixed(0)}%',
+                    style: TextStyle(
+                      color: target.isAchieved ? const Color(0xFF00D179) : target.color,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 2),
+              Text(
+                format.format(target.savedAmount),
                 style: TextStyle(
                   color: mainTextColor,
                   fontSize: 14,

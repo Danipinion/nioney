@@ -5,6 +5,7 @@ import '../providers/app_provider.dart';
 import '../models/wallet.dart';
 import '../models/savings_target.dart';
 import 'savings_targets_screen.dart';
+import 'savings_target_detail_screen.dart';
 
 class WalletsScreen extends StatelessWidget {
   const WalletsScreen({super.key});
@@ -669,7 +670,9 @@ class WalletsScreen extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SavingsTargetsScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => SavingsTargetDetailScreen(targetId: target.id),
+                        ),
                       );
                     },
                     child: Padding(
