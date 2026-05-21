@@ -29,7 +29,7 @@ class AppProvider with ChangeNotifier {
   List<RecurringTransaction> _recurringTransactions = [];
 
   ThemeMode _themeMode = ThemeMode.dark;
-  String _currentPalette = 'Obsidian Mint';
+  String _currentPalette = 'Deep Sapphire';
   String _currencySymbol = 'Rp';
 
   // Getters
@@ -149,7 +149,7 @@ class AppProvider with ChangeNotifier {
     }
 
     // 2. Load Color Palette
-    _currentPalette = prefs.getString(_prefPaletteKey) ?? 'Obsidian Mint';
+    _currentPalette = prefs.getString(_prefPaletteKey) ?? 'Deep Sapphire';
 
     // 3. Load Currency Symbol
     _currencySymbol = prefs.getString(_prefCurrencyKey) ?? 'Rp';

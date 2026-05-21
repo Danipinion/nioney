@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/app_provider.dart';
-import '../main.dart';
 
 class NotesScreen extends StatefulWidget {
   const NotesScreen({super.key});
@@ -16,7 +13,8 @@ class _NotesScreenState extends State<NotesScreen> {
     {
       'id': '1',
       'title': 'Rencana Belanja Bulanan',
-      'content': 'Beli beras pandan wangi, minyak goreng sunco, sabun cuci piring, kopi arabika, dan susu UHT ultra.',
+      'content':
+          'Beli beras pandan wangi, minyak goreng sunco, sabun cuci piring, kopi arabika, dan susu UHT ultra.',
       'tag': 'Shopping Plan',
       'date': '18 Mei 2026',
       'color': const Color(0xFFFFECE2),
@@ -25,7 +23,8 @@ class _NotesScreenState extends State<NotesScreen> {
     {
       'id': '2',
       'title': 'Strategi Investasi 2026',
-      'content': 'Alokasikan 50% di Reksa Dana Obligasi, 30% di Saham Bluechip BCA/BBRI, dan 20% di Emas fisik Antam.',
+      'content':
+          'Alokasikan 50% di Reksa Dana Obligasi, 30% di Saham Bluechip BCA/BBRI, dan 20% di Emas fisik Antam.',
       'tag': 'Investasi',
       'date': '12 Mei 2026',
       'color': const Color(0xFFE8F5E9),
@@ -34,7 +33,8 @@ class _NotesScreenState extends State<NotesScreen> {
     {
       'id': '3',
       'title': 'Ide Bisnis Sampingan',
-      'content': 'Jual kaos katun custom di Tokopedia/Shopee menggunakan sistem print on demand. Modal relatif kecil.',
+      'content':
+          'Jual kaos katun custom di Tokopedia/Shopee menggunakan sistem print on demand. Modal relatif kecil.',
       'tag': 'Bisnis',
       'date': '02 Mei 2026',
       'color': const Color(0xFFE3F2FD),
@@ -84,7 +84,9 @@ class _NotesScreenState extends State<NotesScreen> {
           child: Container(
             decoration: BoxDecoration(
               color: sheetBg,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(28),
+              ),
             ),
             padding: const EdgeInsets.all(24.0),
             child: Column(
@@ -118,7 +120,9 @@ class _NotesScreenState extends State<NotesScreen> {
                     labelText: 'Judul Catatan',
                     labelStyle: TextStyle(color: subColor),
                     filled: true,
-                    fillColor: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.015),
+                    fillColor: isDark
+                        ? Colors.white.withValues(alpha: 0.03)
+                        : Colors.black.withValues(alpha: 0.015),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -133,7 +137,9 @@ class _NotesScreenState extends State<NotesScreen> {
                     labelText: 'Kategori / Tag (e.g. Bisnis)',
                     labelStyle: TextStyle(color: subColor),
                     filled: true,
-                    fillColor: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.015),
+                    fillColor: isDark
+                        ? Colors.white.withValues(alpha: 0.03)
+                        : Colors.black.withValues(alpha: 0.015),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -149,7 +155,9 @@ class _NotesScreenState extends State<NotesScreen> {
                     labelText: 'Isi Catatan Keuangan',
                     labelStyle: TextStyle(color: subColor),
                     filled: true,
-                    fillColor: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.015),
+                    fillColor: isDark
+                        ? Colors.white.withValues(alpha: 0.03)
+                        : Colors.black.withValues(alpha: 0.015),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -179,7 +187,10 @@ class _NotesScreenState extends State<NotesScreen> {
                     },
                     child: const Text(
                       'Simpan Catatan',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -198,8 +209,12 @@ class _NotesScreenState extends State<NotesScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     final mainTextColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final subTextColor = isDark ? Colors.white.withValues(alpha: 0.45) : const Color(0xFF64748B);
-    final borderColor = isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.05);
+    final subTextColor = isDark
+        ? Colors.white.withValues(alpha: 0.45)
+        : const Color(0xFF64748B);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.04)
+        : Colors.black.withValues(alpha: 0.05);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -216,7 +231,11 @@ class _NotesScreenState extends State<NotesScreen> {
         backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: mainTextColor, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: mainTextColor,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -235,9 +254,19 @@ class _NotesScreenState extends State<NotesScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 80.0),
                         child: Column(
                           children: [
-                            Icon(Icons.edit_note_rounded, size: 64, color: subTextColor.withValues(alpha: 0.2)),
+                            Icon(
+                              Icons.edit_note_rounded,
+                              size: 64,
+                              color: subTextColor.withValues(alpha: 0.2),
+                            ),
                             const SizedBox(height: 12),
-                            Text('Belum ada catatan finansial', style: TextStyle(color: mainTextColor, fontSize: 14)),
+                            Text(
+                              'Belum ada catatan finansial',
+                              style: TextStyle(
+                                color: mainTextColor,
+                                fontSize: 14,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -254,18 +283,26 @@ class _NotesScreenState extends State<NotesScreen> {
                           decoration: BoxDecoration(
                             color: isDark ? theme.cardColor : bgCol,
                             borderRadius: BorderRadius.circular(24),
-                            border: Border.all(color: isDark ? borderColor : bgCol),
+                            border: Border.all(
+                              color: isDark ? borderColor : bgCol,
+                            ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: isDark ? txtCol.withValues(alpha: 0.12) : Colors.white,
+                                      color: isDark
+                                          ? txtCol.withValues(alpha: 0.12)
+                                          : Colors.white,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
@@ -278,10 +315,13 @@ class _NotesScreenState extends State<NotesScreen> {
                                     ),
                                   ),
                                   GestureDetector(
-                                    onTap: () => _removeNote(note['id'] as String),
+                                    onTap: () =>
+                                        _removeNote(note['id'] as String),
                                     child: Icon(
                                       Icons.delete_outline_rounded,
-                                      color: isDark ? subTextColor.withValues(alpha: 0.4) : txtCol.withValues(alpha: 0.6),
+                                      color: isDark
+                                          ? subTextColor.withValues(alpha: 0.4)
+                                          : txtCol.withValues(alpha: 0.6),
                                       size: 18,
                                     ),
                                   ),
@@ -301,7 +341,9 @@ class _NotesScreenState extends State<NotesScreen> {
                               Text(
                                 note['content'] as String,
                                 style: TextStyle(
-                                  color: isDark ? subTextColor : const Color(0xFF334155),
+                                  color: isDark
+                                      ? subTextColor
+                                      : const Color(0xFF334155),
                                   fontSize: 13,
                                   height: 1.5,
                                 ),
@@ -310,7 +352,9 @@ class _NotesScreenState extends State<NotesScreen> {
                               Text(
                                 note['date'] as String,
                                 style: TextStyle(
-                                  color: isDark ? subTextColor.withValues(alpha: 0.6) : txtCol.withValues(alpha: 0.8),
+                                  color: isDark
+                                      ? subTextColor.withValues(alpha: 0.6)
+                                      : txtCol.withValues(alpha: 0.8),
                                   fontSize: 10,
                                   fontWeight: FontWeight.w500,
                                 ),

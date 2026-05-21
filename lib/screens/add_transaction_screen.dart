@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../providers/app_provider.dart';
 
 import '../models/transaction.dart';
+
 class AddTransactionScreen extends StatefulWidget {
   final Transaction? editItem;
   const AddTransactionScreen({super.key, this.editItem});
@@ -36,14 +37,20 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   String? _destinationWalletId;
 
   void _syncSplits() {
-    final double totalAmount = double.tryParse(_amountStr.replaceAll('.', '').replaceAll(' ', '')) ?? 0.0;
+    final double totalAmount =
+        double.tryParse(_amountStr.replaceAll('.', '').replaceAll(' ', '')) ??
+        0.0;
     if (_activeAmountField == 0) {
       _reimburseAmount = totalAmount;
       _myShareAmount = 0.0;
       _reimburseStr = _reimburseAmount.toInt().toString();
       _myShareStr = '0';
     } else if (_activeAmountField == 1) {
-      final double parsedReimburse = double.tryParse(_reimburseStr.replaceAll('.', '').replaceAll(' ', '')) ?? 0.0;
+      final double parsedReimburse =
+          double.tryParse(
+            _reimburseStr.replaceAll('.', '').replaceAll(' ', ''),
+          ) ??
+          0.0;
       if (parsedReimburse > totalAmount) {
         _reimburseAmount = totalAmount;
         _reimburseStr = totalAmount.toInt().toString();
@@ -53,7 +60,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       _myShareAmount = totalAmount - _reimburseAmount;
       _myShareStr = _myShareAmount.toInt().toString();
     } else if (_activeAmountField == 2) {
-      final double parsedMyShare = double.tryParse(_myShareStr.replaceAll('.', '').replaceAll(' ', '')) ?? 0.0;
+      final double parsedMyShare =
+          double.tryParse(
+            _myShareStr.replaceAll('.', '').replaceAll(' ', ''),
+          ) ??
+          0.0;
       if (parsedMyShare > totalAmount) {
         _myShareAmount = totalAmount;
         _myShareStr = totalAmount.toInt().toString();
@@ -73,11 +84,13 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<AppProvider>(context, listen: false);
-      
+
       if (widget.editItem != null) {
         final tx = widget.editItem!;
         setState(() {
-          _transactionTypeIndex = tx.categoryId == 'sys_transfer' ? 2 : (tx.isExpense ? 0 : 1);
+          _transactionTypeIndex = tx.categoryId == 'sys_transfer'
+              ? 2
+              : (tx.isExpense ? 0 : 1);
           _selectedCategoryId = tx.categoryId;
           _selectedSubCategory = tx.subCategory;
           _selectedWalletId = tx.walletId;
@@ -85,7 +98,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           _amountStr = tx.amount.toInt().toString();
           _titleController.text = tx.title;
           _noteController.text = tx.note;
-          
+
           if (provider.wallets.isNotEmpty) {
             _destinationWalletId = provider.wallets.first.id;
           }
@@ -115,7 +128,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   void _updateCategorySelection(AppProvider provider) {
-    final bool isExpense = _transactionTypeIndex == 0 || _transactionTypeIndex == 2;
+    final bool isExpense =
+        _transactionTypeIndex == 0 || _transactionTypeIndex == 2;
     final filtered = provider.categories
         .where((c) => c.isExpense == isExpense)
         .toList();
@@ -131,8 +145,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
     final headerBgColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final pickerBgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
-    
+    final pickerBgColor = isDark
+        ? const Color(0xFF0F172A)
+        : const Color(0xFFF8FAFC);
+
     DateTime tempPickedDate = _selectedDate;
 
     showModalBottomSheet(
@@ -153,7 +169,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 14,
+                    ),
                     decoration: BoxDecoration(
                       color: headerBgColor,
                       borderRadius: const BorderRadius.only(
@@ -162,7 +181,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       ),
                       border: Border(
                         bottom: BorderSide(
-                          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+                          color: isDark
+                              ? Colors.white10
+                              : Colors.black.withValues(alpha: 0.05),
                         ),
                       ),
                     ),
@@ -237,19 +258,25 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ],
               ),
             );
-          }
+          },
         );
       },
     );
   }
 
   Future<void> _submitData() async {
-    final hasOperators = _amountStr.contains('+') || _amountStr.contains('-') || _amountStr.contains('x') || _amountStr.contains('÷');
+    final hasOperators =
+        _amountStr.contains('+') ||
+        _amountStr.contains('-') ||
+        _amountStr.contains('x') ||
+        _amountStr.contains('÷');
     if (hasOperators) {
       _performCalculation();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Hasil perhitungan telah diperbarui. Ketuk done sekali lagi untuk menyimpan.'),
+          content: Text(
+            'Hasil perhitungan telah diperbarui. Ketuk done sekali lagi untuk menyimpan.',
+          ),
           duration: Duration(seconds: 2),
         ),
       );
@@ -304,32 +331,41 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
     String noteText = _noteController.text.trim();
     if (_titipBayar && _transactionTypeIndex == 0) {
-      final formattedReimburse = _formatAmount(_reimburseAmount.toInt().toString());
+      final formattedReimburse = _formatAmount(
+        _reimburseAmount.toInt().toString(),
+      );
       final formattedBeban = _formatAmount(_myShareAmount.toInt().toString());
-      final splitNote = 'Reimburse: Rp $formattedReimburse | Beban: Rp $formattedBeban';
+      final splitNote =
+          'Reimburse: Rp $formattedReimburse | Beban: Rp $formattedBeban';
       noteText = noteText.isEmpty ? '[$splitNote]' : '[$splitNote] $noteText';
     }
 
     if (_transactionTypeIndex == 2) {
-      final sourceWallet = provider.wallets.firstWhere((w) => w.id == _selectedWalletId);
-      final destWallet = provider.wallets.firstWhere((w) => w.id == _destinationWalletId);
+      final sourceWallet = provider.wallets.firstWhere(
+        (w) => w.id == _selectedWalletId,
+      );
+      final destWallet = provider.wallets.firstWhere(
+        (w) => w.id == _destinationWalletId,
+      );
 
       final sourceTitle = 'Transfer ke ${destWallet.name}';
       final destTitle = 'Transfer dari ${sourceWallet.name}';
 
       if (widget.editItem != null) {
         // Warning: Edit transfer is not fully supported for two sides simultaneously, so we just update the source transaction if edited
-        await provider.updateTransaction(Transaction(
-          id: widget.editItem!.id,
-          title: sourceTitle,
-          amount: parsedAmount,
-          isExpense: true,
-          categoryId: 'sys_transfer',
-          subCategory: 'Transfer',
-          walletId: _selectedWalletId!,
-          date: _selectedDate,
-          note: noteText,
-        ));
+        await provider.updateTransaction(
+          Transaction(
+            id: widget.editItem!.id,
+            title: sourceTitle,
+            amount: parsedAmount,
+            isExpense: true,
+            categoryId: 'sys_transfer',
+            subCategory: 'Transfer',
+            walletId: _selectedWalletId!,
+            date: _selectedDate,
+            note: noteText,
+          ),
+        );
       } else {
         await provider.addTransaction(
           title: sourceTitle,
@@ -358,21 +394,25 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     } else {
       String finalTitle = _titleController.text.trim();
       if (finalTitle.isEmpty) {
-        finalTitle = _selectedSubCategory.isNotEmpty ? _selectedSubCategory : 'Transaksi Tanpa Judul';
+        finalTitle = _selectedSubCategory.isNotEmpty
+            ? _selectedSubCategory
+            : 'Transaksi Tanpa Judul';
       }
 
       if (widget.editItem != null) {
-        await provider.updateTransaction(Transaction(
-          id: widget.editItem!.id,
-          title: finalTitle,
-          amount: parsedAmount,
-          isExpense: _transactionTypeIndex == 0,
-          categoryId: _selectedCategoryId!,
-          subCategory: _selectedSubCategory,
-          walletId: _selectedWalletId!,
-          date: _selectedDate,
-          note: noteText,
-        ));
+        await provider.updateTransaction(
+          Transaction(
+            id: widget.editItem!.id,
+            title: finalTitle,
+            amount: parsedAmount,
+            isExpense: _transactionTypeIndex == 0,
+            categoryId: _selectedCategoryId!,
+            subCategory: _selectedSubCategory,
+            walletId: _selectedWalletId!,
+            date: _selectedDate,
+            note: noteText,
+          ),
+        );
       } else {
         await provider.addTransaction(
           title: finalTitle,
@@ -393,7 +433,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   double _evaluateExpression(String expr) {
-    String cleanExpr = expr.replaceAll('x', '*').replaceAll('÷', '/').replaceAll(' ', '');
+    String cleanExpr = expr
+        .replaceAll('x', '*')
+        .replaceAll('÷', '/')
+        .replaceAll(' ', '');
     try {
       final RegExp regExp = RegExp(r'(\d+\.?\d*)|([\+\-\*\/])');
       final matches = regExp.allMatches(cleanExpr);
@@ -589,7 +632,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   String _formatAmount(String value) {
     if (value.isEmpty || value == '0') return '0';
 
-    final hasOperators = value.contains('+') || value.contains('-') || value.contains('x') || value.contains('÷');
+    final hasOperators =
+        value.contains('+') ||
+        value.contains('-') ||
+        value.contains('x') ||
+        value.contains('÷');
     if (!hasOperators) {
       final n = double.tryParse(value.replaceAll('.', '')) ?? 0;
       final formatter = NumberFormat('#,###', 'id_ID');
@@ -602,7 +649,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     StringBuffer sb = StringBuffer();
     for (var m in matches) {
       String token = m.group(0)!;
-      if (token.contains('+') || token.contains('-') || token.contains('x') || token.contains('÷') || token.trim().isEmpty) {
+      if (token.contains('+') ||
+          token.contains('-') ||
+          token.contains('x') ||
+          token.contains('÷') ||
+          token.trim().isEmpty) {
         sb.write(token);
       } else {
         final cleanNum = token.replaceAll('.', '');
@@ -615,14 +666,30 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   String _getFormattedDateLabel() {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'Mei',
+      'Jun',
+      'Jul',
+      'Agu',
+      'Sep',
+      'Okt',
+      'Nov',
+      'Des',
+    ];
     final monthStr = months[_selectedDate.month - 1];
     final dayStr = _selectedDate.day.toString();
     final timeStr = DateFormat('HH:mm').format(_selectedDate);
     return '$monthStr $dayStr\n$timeStr';
   }
 
-  List<Map<String, dynamic>> _getSubCategories(AppProvider provider, String categoryId) {
+  List<Map<String, dynamic>> _getSubCategories(
+    AppProvider provider,
+    String categoryId,
+  ) {
     final subList = provider.getSubCategoriesForCategory(categoryId);
     if (subList.isEmpty) {
       return [
@@ -631,7 +698,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         {'name': 'Lain-lain', 'icon': Icons.more_horiz_rounded},
       ];
     }
-    return subList.map((name) => {'name': name, 'icon': Icons.circle_outlined}).toList();
+    return subList
+        .map((name) => {'name': name, 'icon': Icons.circle_outlined})
+        .toList();
   }
 
   Widget _buildKey({
@@ -645,25 +714,25 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         height: 52,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
         child: Material(
           color: bgColor,
           borderRadius: BorderRadius.circular(16),
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
             onTap: onTap,
-            child: Center(
-              child: child,
-            ),
+            child: Center(child: child),
           ),
         ),
       ),
     );
   }
 
-  void _showWalletSelectionSheet(BuildContext context, AppProvider provider, {required bool isSource}) {
+  void _showWalletSelectionSheet(
+    BuildContext context,
+    AppProvider provider, {
+    required bool isSource,
+  }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
@@ -728,7 +797,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         title: Text(
                           wallet.name,
                           style: TextStyle(
-                            color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            color: isDark
+                                ? Colors.white
+                                : const Color(0xFF0F172A),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -755,17 +826,28 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
     final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
     final subTextColor = isDark ? Colors.white70 : const Color(0xFF64748B);
-    final mutedTextColor = isDark ? Colors.white.withValues(alpha: 0.4) : const Color(0xFF94A3B8);
-    final borderCol = isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04);
+    final mutedTextColor = isDark
+        ? Colors.white.withValues(alpha: 0.4)
+        : const Color(0xFF94A3B8);
+    final borderCol = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.04);
     final inputBg = isDark ? const Color(0xFF1E293B) : Colors.white;
 
     final filteredCategories = provider.categories
-        .where((c) => c.isExpense == (_transactionTypeIndex == 0 || _transactionTypeIndex == 2) && !c.id.startsWith('sys_'))
+        .where(
+          (c) =>
+              c.isExpense ==
+                  (_transactionTypeIndex == 0 || _transactionTypeIndex == 2) &&
+              !c.id.startsWith('sys_'),
+        )
         .toList();
 
     final activeMainCategory = filteredCategories.firstWhere(
       (c) => c.id == _selectedCategoryId,
-      orElse: () => filteredCategories.isNotEmpty ? filteredCategories.first : filteredCategories[0],
+      orElse: () => filteredCategories.isNotEmpty
+          ? filteredCategories.first
+          : filteredCategories[0],
     );
 
     final subCategories = _getSubCategories(provider, activeMainCategory.id);
@@ -805,7 +887,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       height: 48,
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+                        color: isDark
+                            ? const Color(0xFF1E293B)
+                            : const Color(0xFFE2E8F0),
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: Row(
@@ -907,7 +991,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       ),
                     ),
                   ),
-
                 ],
               ),
             ),
@@ -950,17 +1033,24 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                       decoration: BoxDecoration(
                                         color: isSelected
                                             ? cat.color
-                                            : (isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0)),
+                                            : (isDark
+                                                  ? const Color(0xFF1E293B)
+                                                  : const Color(0xFFE2E8F0)),
                                         shape: BoxShape.circle,
                                         border: isSelected
-                                            ? Border.all(color: Colors.white, width: 2)
+                                            ? Border.all(
+                                                color: Colors.white,
+                                                width: 2,
+                                              )
                                             : null,
                                       ),
                                       child: Icon(
                                         cat.icon,
                                         color: isSelected
                                             ? Colors.white
-                                            : (isDark ? Colors.white70 : const Color(0xFF64748B)),
+                                            : (isDark
+                                                  ? Colors.white70
+                                                  : const Color(0xFF64748B)),
                                         size: 20,
                                       ),
                                     ),
@@ -968,9 +1058,13 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                     Text(
                                       cat.name,
                                       style: TextStyle(
-                                        color: isSelected ? textColor : subTextColor,
+                                        color: isSelected
+                                            ? textColor
+                                            : subTextColor,
                                         fontSize: 10,
-                                        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w800
+                                            : FontWeight.w600,
                                       ),
                                       textAlign: TextAlign.center,
                                       maxLines: 1,
@@ -995,28 +1089,38 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                             itemCount: subCategories.length,
                             itemBuilder: (context, index) {
                               final subCat = subCategories[index];
-                              final isSelected = _selectedSubCategory == subCat['name'];
+                              final isSelected =
+                                  _selectedSubCategory == subCat['name'];
                               final activeColor = activeMainCategory.color;
-                                return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedSubCategory = subCat['name'];
-                                      final currentTitle = _titleController.text.trim();
-                                      final isCurrentlySubCatName = subCategories.any((sc) => sc['name'] == currentTitle) || currentTitle.isEmpty;
-                                      if (isCurrentlySubCatName) {
-                                        _titleController.text = subCat['name'];
-                                      }
-                                    });
-                                  },
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedSubCategory = subCat['name'];
+                                    final currentTitle = _titleController.text
+                                        .trim();
+                                    final isCurrentlySubCatName =
+                                        subCategories.any(
+                                          (sc) => sc['name'] == currentTitle,
+                                        ) ||
+                                        currentTitle.isEmpty;
+                                    if (isCurrentlySubCatName) {
+                                      _titleController.text = subCat['name'];
+                                    }
+                                  });
+                                },
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 150),
                                   margin: const EdgeInsets.only(right: 8),
-                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: inputBg,
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
-                                      color: isSelected ? activeColor : borderCol,
+                                      color: isSelected
+                                          ? activeColor
+                                          : borderCol,
                                       width: isSelected ? 1.5 : 1,
                                     ),
                                   ),
@@ -1024,16 +1128,22 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                     children: [
                                       Icon(
                                         subCat['icon'],
-                                        color: isSelected ? activeColor : subTextColor,
+                                        color: isSelected
+                                            ? activeColor
+                                            : subTextColor,
                                         size: 14,
                                       ),
                                       const SizedBox(width: 6),
                                       Text(
                                         subCat['name'],
                                         style: TextStyle(
-                                          color: isSelected ? textColor : subTextColor,
+                                          color: isSelected
+                                              ? textColor
+                                              : subTextColor,
                                           fontSize: 11,
-                                          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                          fontWeight: isSelected
+                                              ? FontWeight.w800
+                                              : FontWeight.w600,
                                         ),
                                       ),
                                     ],
@@ -1072,16 +1182,26 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                 // Left: Dompet Asal (Source)
                                 Expanded(
                                   child: GestureDetector(
-                                    onTap: () => _showWalletSelectionSheet(context, provider, isSource: true),
+                                    onTap: () => _showWalletSelectionSheet(
+                                      context,
+                                      provider,
+                                      isSource: true,
+                                    ),
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 14,
+                                        vertical: 12,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                                        color: isDark
+                                            ? const Color(0xFF0F172A)
+                                            : const Color(0xFFF8FAFC),
                                         borderRadius: BorderRadius.circular(16),
                                         border: Border.all(color: borderCol),
                                       ),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             'Dari Dompet',
@@ -1096,10 +1216,23 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                             children: [
                                               Icon(
                                                 _selectedWalletId != null
-                                                    ? provider.wallets.firstWhere((w) => w.id == _selectedWalletId).icon
-                                                    : Icons.account_balance_wallet_rounded,
+                                                    ? provider.wallets
+                                                          .firstWhere(
+                                                            (w) =>
+                                                                w.id ==
+                                                                _selectedWalletId,
+                                                          )
+                                                          .icon
+                                                    : Icons
+                                                          .account_balance_wallet_rounded,
                                                 color: _selectedWalletId != null
-                                                    ? provider.wallets.firstWhere((w) => w.id == _selectedWalletId).color
+                                                    ? provider.wallets
+                                                          .firstWhere(
+                                                            (w) =>
+                                                                w.id ==
+                                                                _selectedWalletId,
+                                                          )
+                                                          .color
                                                     : theme.primaryColor,
                                                 size: 16,
                                               ),
@@ -1107,14 +1240,21 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                               Expanded(
                                                 child: Text(
                                                   _selectedWalletId != null
-                                                      ? provider.wallets.firstWhere((w) => w.id == _selectedWalletId).name
+                                                      ? provider.wallets
+                                                            .firstWhere(
+                                                              (w) =>
+                                                                  w.id ==
+                                                                  _selectedWalletId,
+                                                            )
+                                                            .name
                                                       : 'Pilih Asal',
                                                   style: TextStyle(
                                                     color: textColor,
                                                     fontSize: 13,
                                                     fontWeight: FontWeight.w800,
                                                   ),
-                                                  overflow: TextOverflow.ellipsis,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
                                               ),
                                             ],
@@ -1126,10 +1266,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                 ),
                                 // Middle Transfer Arrow Icon
                                 Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: theme.primaryColor.withValues(alpha: 0.1),
+                                    color: theme.primaryColor.withValues(
+                                      alpha: 0.1,
+                                    ),
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(
@@ -1141,16 +1285,26 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                 // Right: Dompet Tujuan (Destination)
                                 Expanded(
                                   child: GestureDetector(
-                                    onTap: () => _showWalletSelectionSheet(context, provider, isSource: false),
+                                    onTap: () => _showWalletSelectionSheet(
+                                      context,
+                                      provider,
+                                      isSource: false,
+                                    ),
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 14,
+                                        vertical: 12,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                                        color: isDark
+                                            ? const Color(0xFF0F172A)
+                                            : const Color(0xFFF8FAFC),
                                         borderRadius: BorderRadius.circular(16),
                                         border: Border.all(color: borderCol),
                                       ),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             'Ke Dompet',
@@ -1165,10 +1319,24 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                             children: [
                                               Icon(
                                                 _destinationWalletId != null
-                                                    ? provider.wallets.firstWhere((w) => w.id == _destinationWalletId).icon
-                                                    : Icons.account_balance_wallet_rounded,
-                                                color: _destinationWalletId != null
-                                                    ? provider.wallets.firstWhere((w) => w.id == _destinationWalletId).color
+                                                    ? provider.wallets
+                                                          .firstWhere(
+                                                            (w) =>
+                                                                w.id ==
+                                                                _destinationWalletId,
+                                                          )
+                                                          .icon
+                                                    : Icons
+                                                          .account_balance_wallet_rounded,
+                                                color:
+                                                    _destinationWalletId != null
+                                                    ? provider.wallets
+                                                          .firstWhere(
+                                                            (w) =>
+                                                                w.id ==
+                                                                _destinationWalletId,
+                                                          )
+                                                          .color
                                                     : Colors.teal,
                                                 size: 16,
                                               ),
@@ -1176,14 +1344,21 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                               Expanded(
                                                 child: Text(
                                                   _destinationWalletId != null
-                                                      ? provider.wallets.firstWhere((w) => w.id == _destinationWalletId).name
+                                                      ? provider.wallets
+                                                            .firstWhere(
+                                                              (w) =>
+                                                                  w.id ==
+                                                                  _destinationWalletId,
+                                                            )
+                                                            .name
                                                       : 'Pilih Tujuan',
                                                   style: TextStyle(
                                                     color: textColor,
                                                     fontSize: 13,
                                                     fontWeight: FontWeight.w800,
                                                   ),
-                                                  overflow: TextOverflow.ellipsis,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
                                               ),
                                             ],
@@ -1218,9 +1393,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       children: [
                         // Currency Rp dropdown pill
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+                            color: isDark
+                                ? const Color(0xFF1E293B)
+                                : const Color(0xFFE2E8F0),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -1228,7 +1408,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                               Text(
                                 provider.currencySymbol,
                                 style: TextStyle(
-                                  color: isDark ? Colors.white : const Color(0xFF23354E),
+                                  color: isDark
+                                      ? Colors.white
+                                      : const Color(0xFF23354E),
                                   fontWeight: FontWeight.w800,
                                   fontSize: 14,
                                 ),
@@ -1236,7 +1418,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                               const SizedBox(width: 4),
                               Icon(
                                 Icons.arrow_drop_down,
-                                color: isDark ? Colors.white70 : const Color(0xFF23354E),
+                                color: isDark
+                                    ? Colors.white70
+                                    : const Color(0xFF23354E),
                                 size: 16,
                               ),
                             ],
@@ -1252,7 +1436,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                           },
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 150),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: _activeAmountField == 0
                                   ? theme.primaryColor.withValues(alpha: 0.05)
@@ -1282,7 +1469,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                     margin: const EdgeInsets.only(left: 2),
                                     width: 2.5,
                                     height: 32,
-                                    color: theme.primaryColor.withValues(alpha: 0.7),
+                                    color: theme.primaryColor.withValues(
+                                      alpha: 0.7,
+                                    ),
                                   ),
                               ],
                             ),
@@ -1294,7 +1483,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
                     // Reimburse (Titip Bayar) switch card container
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       decoration: BoxDecoration(
                         color: inputBg,
                         borderRadius: BorderRadius.circular(20),
@@ -1326,12 +1518,13 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                           ),
                           CupertinoSwitch(
                             value: _titipBayar,
-                            activeColor: theme.primaryColor,
+                            activeTrackColor: theme.primaryColor,
                             onChanged: (val) {
                               setState(() {
                                 _titipBayar = val;
                                 if (_titipBayar) {
-                                  _activeAmountField = 1; // Focus to Reimburse field when switched ON!
+                                  _activeAmountField =
+                                      1; // Focus to Reimburse field when switched ON!
                                   _syncSplits();
                                 } else {
                                   _activeAmountField = 0; // Focus back to Total
@@ -1347,7 +1540,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                          color: isDark
+                              ? const Color(0xFF1E293B)
+                              : Colors.white,
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(color: borderCol),
                         ),
@@ -1374,37 +1569,53 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                       });
                                     },
                                     child: AnimatedContainer(
-                                      duration: const Duration(milliseconds: 150),
+                                      duration: const Duration(
+                                        milliseconds: 150,
+                                      ),
                                       padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
                                         color: _activeAmountField == 1
-                                            ? theme.primaryColor.withValues(alpha: 0.08)
-                                            : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC)),
+                                            ? theme.primaryColor.withValues(
+                                                alpha: 0.08,
+                                              )
+                                            : (isDark
+                                                  ? const Color(0xFF0F172A)
+                                                  : const Color(0xFFF8FAFC)),
                                         borderRadius: BorderRadius.circular(16),
                                         border: Border.all(
                                           color: _activeAmountField == 1
                                               ? theme.primaryColor
                                               : borderCol,
-                                          width: _activeAmountField == 1 ? 1.5 : 1,
+                                          width: _activeAmountField == 1
+                                              ? 1.5
+                                              : 1,
                                         ),
                                       ),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
                                                 'Dititip (Reimburse)',
                                                 style: TextStyle(
-                                                  color: _activeAmountField == 1 ? theme.primaryColor : subTextColor,
+                                                  color: _activeAmountField == 1
+                                                      ? theme.primaryColor
+                                                      : subTextColor,
                                                   fontSize: 10,
                                                   fontWeight: FontWeight.w700,
                                                 ),
                                               ),
                                               Icon(
                                                 Icons.arrow_circle_down_rounded,
-                                                color: _activeAmountField == 1 ? theme.primaryColor : subTextColor.withValues(alpha: 0.5),
+                                                color: _activeAmountField == 1
+                                                    ? theme.primaryColor
+                                                    : subTextColor.withValues(
+                                                        alpha: 0.5,
+                                                      ),
                                                 size: 14,
                                               ),
                                             ],
@@ -1415,7 +1626,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                               Text(
                                                 'Rp ',
                                                 style: TextStyle(
-                                                  color: _activeAmountField == 1 ? textColor : subTextColor,
+                                                  color: _activeAmountField == 1
+                                                      ? textColor
+                                                      : subTextColor,
                                                   fontSize: 11,
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -1429,12 +1642,15 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                                     fontFamily: 'Outfit',
                                                     fontWeight: FontWeight.w800,
                                                   ),
-                                                  overflow: TextOverflow.ellipsis,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
                                               ),
                                               if (_activeAmountField == 1)
                                                 Container(
-                                                  margin: const EdgeInsets.only(left: 2),
+                                                  margin: const EdgeInsets.only(
+                                                    left: 2,
+                                                  ),
                                                   width: 1.5,
                                                   height: 14,
                                                   color: theme.primaryColor,
@@ -1456,37 +1672,53 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                       });
                                     },
                                     child: AnimatedContainer(
-                                      duration: const Duration(milliseconds: 150),
+                                      duration: const Duration(
+                                        milliseconds: 150,
+                                      ),
                                       padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
                                         color: _activeAmountField == 2
-                                            ? Colors.orange.withValues(alpha: 0.08)
-                                            : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC)),
+                                            ? Colors.orange.withValues(
+                                                alpha: 0.08,
+                                              )
+                                            : (isDark
+                                                  ? const Color(0xFF0F172A)
+                                                  : const Color(0xFFF8FAFC)),
                                         borderRadius: BorderRadius.circular(16),
                                         border: Border.all(
                                           color: _activeAmountField == 2
                                               ? Colors.orange
                                               : borderCol,
-                                          width: _activeAmountField == 2 ? 1.5 : 1,
+                                          width: _activeAmountField == 2
+                                              ? 1.5
+                                              : 1,
                                         ),
                                       ),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
                                                 'Beban Saya',
                                                 style: TextStyle(
-                                                  color: _activeAmountField == 2 ? Colors.orange : subTextColor,
+                                                  color: _activeAmountField == 2
+                                                      ? Colors.orange
+                                                      : subTextColor,
                                                   fontSize: 10,
                                                   fontWeight: FontWeight.w700,
                                                 ),
                                               ),
                                               Icon(
                                                 Icons.person_outline_rounded,
-                                                color: _activeAmountField == 2 ? Colors.orange : subTextColor.withValues(alpha: 0.5),
+                                                color: _activeAmountField == 2
+                                                    ? Colors.orange
+                                                    : subTextColor.withValues(
+                                                        alpha: 0.5,
+                                                      ),
                                                 size: 14,
                                               ),
                                             ],
@@ -1497,7 +1729,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                               Text(
                                                 'Rp ',
                                                 style: TextStyle(
-                                                  color: _activeAmountField == 2 ? textColor : subTextColor,
+                                                  color: _activeAmountField == 2
+                                                      ? textColor
+                                                      : subTextColor,
                                                   fontSize: 11,
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -1511,12 +1745,15 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                                     fontFamily: 'Outfit',
                                                     fontWeight: FontWeight.w800,
                                                   ),
-                                                  overflow: TextOverflow.ellipsis,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
                                               ),
                                               if (_activeAmountField == 2)
                                                 Container(
-                                                  margin: const EdgeInsets.only(left: 2),
+                                                  margin: const EdgeInsets.only(
+                                                    left: 2,
+                                                  ),
                                                   width: 1.5,
                                                   height: 14,
                                                   color: Colors.orange,
@@ -1537,46 +1774,86 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                               children: [
                                 GestureDetector(
                                   onTap: () {
-                                    final double totalAmount = double.tryParse(_amountStr.replaceAll('.', '').replaceAll(' ', '')) ?? 0.0;
+                                    final double totalAmount =
+                                        double.tryParse(
+                                          _amountStr
+                                              .replaceAll('.', '')
+                                              .replaceAll(' ', ''),
+                                        ) ??
+                                        0.0;
                                     setState(() {
                                       _reimburseAmount = totalAmount;
                                       _myShareAmount = 0.0;
-                                      _reimburseStr = _reimburseAmount.toInt().toString();
+                                      _reimburseStr = _reimburseAmount
+                                          .toInt()
+                                          .toString();
                                       _myShareStr = '0';
                                     });
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 5,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.04),
+                                      color: isDark
+                                          ? Colors.white10
+                                          : Colors.black.withValues(
+                                              alpha: 0.04,
+                                            ),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Text(
                                       '100% Dititip',
-                                      style: TextStyle(color: subTextColor, fontSize: 9, fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                        color: subTextColor,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 GestureDetector(
                                   onTap: () {
-                                    final double totalAmount = double.tryParse(_amountStr.replaceAll('.', '').replaceAll(' ', '')) ?? 0.0;
+                                    final double totalAmount =
+                                        double.tryParse(
+                                          _amountStr
+                                              .replaceAll('.', '')
+                                              .replaceAll(' ', ''),
+                                        ) ??
+                                        0.0;
                                     setState(() {
                                       _reimburseAmount = totalAmount / 2;
                                       _myShareAmount = totalAmount / 2;
-                                      _reimburseStr = _reimburseAmount.toInt().toString();
-                                      _myShareStr = _myShareAmount.toInt().toString();
+                                      _reimburseStr = _reimburseAmount
+                                          .toInt()
+                                          .toString();
+                                      _myShareStr = _myShareAmount
+                                          .toInt()
+                                          .toString();
                                     });
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 5,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.04),
+                                      color: isDark
+                                          ? Colors.white10
+                                          : Colors.black.withValues(
+                                              alpha: 0.04,
+                                            ),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Text(
                                       'Bagi Dua (50:50)',
-                                      style: TextStyle(color: subTextColor, fontSize: 9, fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                        color: subTextColor,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -1600,10 +1877,19 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         style: TextStyle(color: textColor, fontSize: 14),
                         decoration: InputDecoration(
                           hintText: 'Judul',
-                          hintStyle: TextStyle(color: mutedTextColor, fontSize: 13),
-                          prefixIcon: Icon(Icons.description_outlined, color: subTextColor, size: 20),
+                          hintStyle: TextStyle(
+                            color: mutedTextColor,
+                            fontSize: 13,
+                          ),
+                          prefixIcon: Icon(
+                            Icons.description_outlined,
+                            color: subTextColor,
+                            size: 20,
+                          ),
                           border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 14,
+                          ),
                         ),
                       ),
                     ),
@@ -1625,10 +1911,19 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                               style: TextStyle(color: textColor, fontSize: 14),
                               decoration: InputDecoration(
                                 hintText: 'Tambah catatan...',
-                                hintStyle: TextStyle(color: mutedTextColor, fontSize: 13),
-                                prefixIcon: Icon(Icons.edit_note_rounded, color: subTextColor, size: 20),
+                                hintStyle: TextStyle(
+                                  color: mutedTextColor,
+                                  fontSize: 13,
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.edit_note_rounded,
+                                  color: subTextColor,
+                                  size: 20,
+                                ),
                                 border: InputBorder.none,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
                               ),
                             ),
                           ),
@@ -1638,22 +1933,35 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                           Expanded(
                             flex: 2,
                             child: GestureDetector(
-                              onTap: () => _showWalletSelectionSheet(context, provider, isSource: true),
+                              onTap: () => _showWalletSelectionSheet(
+                                context,
+                                provider,
+                                isSource: true,
+                              ),
                               child: Container(
                                 height: 48,
-                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                ),
                                 decoration: BoxDecoration(
                                   color: inputBg,
                                   borderRadius: BorderRadius.circular(16),
                                   border: Border.all(color: borderCol),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
                                       child: Text(
                                         _selectedWalletId != null
-                                            ? provider.wallets.firstWhere((w) => w.id == _selectedWalletId).name
+                                            ? provider.wallets
+                                                  .firstWhere(
+                                                    (w) =>
+                                                        w.id ==
+                                                        _selectedWalletId,
+                                                  )
+                                                  .name
                                             : 'Pilih Dompet',
                                         style: TextStyle(
                                           color: textColor,
@@ -1686,13 +1994,21 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             // Custom Bottom Grid Keyboard
             Container(
               color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-              padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 20),
+              padding: const EdgeInsets.only(
+                left: 12,
+                right: 12,
+                top: 12,
+                bottom: 20,
+              ),
               child: Column(
                 children: [
                   if (_showOperators)
                     Container(
                       margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 6,
+                        horizontal: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: isDark ? const Color(0xFF0F172A) : Colors.white,
                         borderRadius: BorderRadius.circular(20),
@@ -1775,22 +2091,49 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       _buildKey(
                         bgColor: inputBg,
                         onTap: () => _onKeyboardTap('1'),
-                        child: Text('1', style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          '1',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       _buildKey(
                         bgColor: inputBg,
                         onTap: () => _onKeyboardTap('2'),
-                        child: Text('2', style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          '2',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       _buildKey(
                         bgColor: inputBg,
                         onTap: () => _onKeyboardTap('3'),
-                        child: Text('3', style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          '3',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       _buildKey(
-                        bgColor: isDark ? const Color(0xFF3F2022) : const Color(0xFFFEE2E2),
+                        bgColor: isDark
+                            ? const Color(0xFF3F2022)
+                            : const Color(0xFFFEE2E2),
                         onTap: _onBackspace,
-                        child: Icon(Icons.backspace_outlined, color: Colors.redAccent.shade400, size: 20),
+                        child: Icon(
+                          Icons.backspace_outlined,
+                          color: Colors.redAccent.shade400,
+                          size: 20,
+                        ),
                       ),
                     ],
                   ),
@@ -1799,20 +2142,43 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       _buildKey(
                         bgColor: inputBg,
                         onTap: () => _onKeyboardTap('4'),
-                        child: Text('4', style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          '4',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       _buildKey(
                         bgColor: inputBg,
                         onTap: () => _onKeyboardTap('5'),
-                        child: Text('5', style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          '5',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       _buildKey(
                         bgColor: inputBg,
                         onTap: () => _onKeyboardTap('6'),
-                        child: Text('6', style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          '6',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       _buildKey(
-                        bgColor: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                        bgColor: isDark
+                            ? const Color(0xFF334155)
+                            : const Color(0xFFE2E8F0),
                         onTap: () {
                           setState(() {
                             _showOperators = !_showOperators;
@@ -1821,8 +2187,24 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('+-', style: TextStyle(color: subTextColor, fontSize: 11, fontWeight: FontWeight.w800, height: 1.0)),
-                            Text('x=', style: TextStyle(color: subTextColor, fontSize: 11, fontWeight: FontWeight.w800, height: 1.0)),
+                            Text(
+                              '+-',
+                              style: TextStyle(
+                                color: subTextColor,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                height: 1.0,
+                              ),
+                            ),
+                            Text(
+                              'x=',
+                              style: TextStyle(
+                                color: subTextColor,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                height: 1.0,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -1833,17 +2215,38 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       _buildKey(
                         bgColor: inputBg,
                         onTap: () => _onKeyboardTap('7'),
-                        child: Text('7', style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          '7',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       _buildKey(
                         bgColor: inputBg,
                         onTap: () => _onKeyboardTap('8'),
-                        child: Text('8', style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          '8',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       _buildKey(
                         bgColor: inputBg,
                         onTap: () => _onKeyboardTap('9'),
-                        child: Text('9', style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          '9',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       _buildKey(
                         bgColor: inputBg,
@@ -1867,22 +2270,47 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       _buildKey(
                         bgColor: inputBg,
                         onTap: () => _onKeyboardTap('.'),
-                        child: Text('.', style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          '.',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       _buildKey(
                         bgColor: inputBg,
                         onTap: () => _onKeyboardTap('0'),
-                        child: Text('0', style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          '0',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       _buildKey(
                         bgColor: inputBg,
                         onTap: () => _onKeyboardTap('000'),
-                        child: Text('000', style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          '000',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       _buildKey(
                         bgColor: const Color(0xFF23354E),
                         onTap: _submitData,
-                        child: const Icon(Icons.check_rounded, color: Colors.white, size: 24),
+                        child: const Icon(
+                          Icons.check_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
                       ),
                     ],
                   ),

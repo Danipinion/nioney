@@ -19,54 +19,32 @@ class PaletteColors {
 }
 
 class AppTheme {
-  // Palettes Map
+  // Single premium blue dark mode palette colors
+  static const PaletteColors blueColors = PaletteColors(
+    background: Color(0xFF0A0F1D), // Elegant dark sapphire
+    surface: Color(0xFF131A2E),    // Slate sapphire card
+    surfaceLight: Color(0xFF1E294B),
+    primary: Color(0xFF3B82F6),    // Vibrant blue
+    accent: Color(0xFF60A5FA),     // Accent sky blue
+    cardGradient: [Color(0xFF2563EB), Color(0xFF60A5FA)],
+  );
+
   static const Map<String, PaletteColors> palettes = {
-    'Obsidian Mint': PaletteColors(
-      background: Color(0xFF0C0E12),
-      surface: Color(0xFF161A22),
-      surfaceLight: Color(0xFF222834),
-      primary: Color(0xFF00E676), // Vibrant Mint
-      accent: Color(0xFF26A69A), // Cyan/Teal
-      cardGradient: [Color(0xFF00E676), Color(0xFF00B0FF)],
-    ),
-    'Sunset Rose': PaletteColors(
-      background: Color(0xFF0F0B13),
-      surface: Color(0xFF191322),
-      surfaceLight: Color(0xFF251C33),
-      primary: Color(0xFFFF4081), // Deep Pink
-      accent: Color(0xFFFF7043), // Sunset Orange
-      cardGradient: [Color(0xFFFF4081), Color(0xFFFFAB40)],
-    ),
-    'Cyberpunk Neon': PaletteColors(
-      background: Color(0xFF050505),
-      surface: Color(0xFF121216),
-      surfaceLight: Color(0xFF1C1C24),
-      primary: Color(0xFF00E5FF), // Electric Neon Cyan
-      accent: Color(0xFFE040FB), // Neon Purple
-      cardGradient: [Color(0xFF00E5FF), Color(0xFFE040FB)],
-    ),
-    'Deep Sapphire': PaletteColors(
-      background: Color(0xFF080D1A),
-      surface: Color(0xFF121B2D),
-      surfaceLight: Color(0xFF1D2A45),
-      primary: Color(0xFF29B6F6), // Sapphire Sky
-      accent: Color(0xFFAB47BC), // Lavender Purple
-      cardGradient: [Color(0xFF29B6F6), Color(0xFF7E57C2)],
-    ),
+    'Deep Sapphire': blueColors,
   };
 
   static PaletteColors getColors(String paletteName) {
-    return palettes[paletteName] ?? palettes['Obsidian Mint']!;
+    return blueColors;
   }
 
-  // Light Mode Colors (Fallback/Alternative)
+  // Light Mode Colors (Unified Blue)
   static const PaletteColors lightPalette = PaletteColors(
-    background: Color(0xFFF5F7FA),
+    background: Color(0xFFF8FAFC),
     surface: Colors.white,
-    surfaceLight: Color(0xFFEFEFF4),
-    primary: Color(0xFF00D179),
-    accent: Color(0xFF00B0FF),
-    cardGradient: [Color(0xFF00D179), Color(0xFF00B0FF)],
+    surfaceLight: Color(0xFFF1F5F9),
+    primary: Color(0xFF2563EB), // Blue 600
+    accent: Color(0xFF3B82F6),
+    cardGradient: [Color(0xFF2563EB), Color(0xFF3B82F6)],
   );
 
   static ThemeData buildTheme(

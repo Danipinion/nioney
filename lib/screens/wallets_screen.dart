@@ -19,16 +19,24 @@ class WalletsScreen extends StatelessWidget {
     final provider = Provider.of<AppProvider>(context);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
     final subTextColor = isDark ? Colors.white70 : const Color(0xFF64748B);
-    final scaffoldBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9);
+    final scaffoldBg = isDark
+        ? const Color(0xFF0F172A)
+        : const Color(0xFFF1F5F9);
     final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderCol = isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04);
+    final borderCol = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.04);
 
     // Calculate totals
     double totalBalance = provider.wallets.fold(0, (sum, w) => sum + w.balance);
-    final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 2);
+    final formatter = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp',
+      decimalDigits: 2,
+    );
 
     return Scaffold(
       backgroundColor: scaffoldBg,
@@ -113,10 +121,17 @@ class WalletsScreen extends StatelessWidget {
                           children: [
                             const Text(
                               'Dapat Dibelanjakan (IDR)',
-                              style: TextStyle(color: Colors.white70, fontSize: 13),
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 13,
+                              ),
                             ),
                             const SizedBox(width: 4),
-                            Icon(Icons.swap_horiz_rounded, color: Colors.white.withValues(alpha: 0.7), size: 14),
+                            Icon(
+                              Icons.swap_horiz_rounded,
+                              color: Colors.white.withValues(alpha: 0.7),
+                              size: 14,
+                            ),
                           ],
                         ),
                         const SizedBox(height: 8),
@@ -134,38 +149,78 @@ class WalletsScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Row(
                                 children: const [
-                                  Icon(Icons.arrow_downward_rounded, color: Colors.white, size: 12),
+                                  Icon(
+                                    Icons.arrow_downward_rounded,
+                                    color: Colors.white,
+                                    size: 12,
+                                  ),
                                   SizedBox(width: 4),
-                                  Text('-0.0%', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                                  Text(
+                                    '-0.0%',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Text('(Rp1,00) 30 hari terakhir', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                            const Text(
+                              '(Rp1,00) 30 hari terakhir',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 11,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 24),
                         // Grid 2x2
                         Row(
                           children: [
-                            Expanded(child: _buildMiniStatCard('Saldo Bersih', formatter.format(totalBalance))),
+                            Expanded(
+                              child: _buildMiniStatCard(
+                                'Saldo Bersih',
+                                formatter.format(totalBalance),
+                              ),
+                            ),
                             const SizedBox(width: 12),
-                            Expanded(child: _buildMiniStatCard('Hutang Aktif', formatter.format(0))),
+                            Expanded(
+                              child: _buildMiniStatCard(
+                                'Hutang Aktif',
+                                formatter.format(0),
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            Expanded(child: _buildMiniStatCard('Tabungan Aktif', formatter.format(0))),
+                            Expanded(
+                              child: _buildMiniStatCard(
+                                'Tabungan Aktif',
+                                formatter.format(0),
+                              ),
+                            ),
                             const SizedBox(width: 12),
-                            Expanded(child: _buildMiniStatCard('Pembayaran Mendatang', formatter.format(0))),
+                            Expanded(
+                              child: _buildMiniStatCard(
+                                'Pembayaran Mendatang',
+                                formatter.format(0),
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -177,12 +232,62 @@ class WalletsScreen extends StatelessWidget {
             const SizedBox(height: 30),
 
             // Wallet Sections
-            _buildWalletSection('Tunai', 'Cash', provider, cardBg, textColor, subTextColor, borderCol, formatter, context),
-            _buildWalletSection('Akun Bank', 'Bank', provider, cardBg, textColor, subTextColor, borderCol, formatter, context),
-            _buildWalletSection('E-Wallet', 'E-Wallet', provider, cardBg, textColor, subTextColor, borderCol, formatter, context),
-            _buildWalletSection('Investasi', 'Investment', provider, cardBg, textColor, subTextColor, borderCol, formatter, context),
-            _buildWalletSection('Kartu Kredit', 'Credit Card', provider, cardBg, textColor, subTextColor, borderCol, formatter, context),
-            
+            _buildWalletSection(
+              'Tunai',
+              'Cash',
+              provider,
+              cardBg,
+              textColor,
+              subTextColor,
+              borderCol,
+              formatter,
+              context,
+            ),
+            _buildWalletSection(
+              'Akun Bank',
+              'Bank',
+              provider,
+              cardBg,
+              textColor,
+              subTextColor,
+              borderCol,
+              formatter,
+              context,
+            ),
+            _buildWalletSection(
+              'E-Wallet',
+              'E-Wallet',
+              provider,
+              cardBg,
+              textColor,
+              subTextColor,
+              borderCol,
+              formatter,
+              context,
+            ),
+            _buildWalletSection(
+              'Investasi',
+              'Investment',
+              provider,
+              cardBg,
+              textColor,
+              subTextColor,
+              borderCol,
+              formatter,
+              context,
+            ),
+            _buildWalletSection(
+              'Kartu Kredit',
+              'Credit Card',
+              provider,
+              cardBg,
+              textColor,
+              subTextColor,
+              borderCol,
+              formatter,
+              context,
+            ),
+
             const SizedBox(height: 100),
           ],
         ),
@@ -200,23 +305,47 @@ class WalletsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(color: Colors.white70, fontSize: 10)),
+          Text(
+            title,
+            style: const TextStyle(color: Colors.white70, fontSize: 10),
+          ),
           const SizedBox(height: 4),
-          Text(amount, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+          Text(
+            amount,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildWalletSection(String title, String type, AppProvider provider, Color cardBg, Color textColor, Color subTextColor, Color borderCol, NumberFormat formatter, BuildContext context) {
+  Widget _buildWalletSection(
+    String title,
+    String type,
+    AppProvider provider,
+    Color cardBg,
+    Color textColor,
+    Color subTextColor,
+    Color borderCol,
+    NumberFormat formatter,
+    BuildContext context,
+  ) {
     final wallets = provider.wallets.where((w) => w.type == type).toList();
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w800),
+          style: TextStyle(
+            color: textColor,
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+          ),
         ),
         const SizedBox(height: 12),
         if (wallets.isEmpty)
@@ -238,10 +367,15 @@ class WalletsScreen extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    type == 'Bank' ? Icons.account_balance_rounded : 
-                    type == 'E-Wallet' ? Icons.account_balance_wallet_rounded : 
-                    type == 'Investment' ? Icons.trending_up_rounded : Icons.account_balance_wallet_rounded, 
-                    color: subTextColor, size: 24
+                    type == 'Bank'
+                        ? Icons.account_balance_rounded
+                        : type == 'E-Wallet'
+                        ? Icons.account_balance_wallet_rounded
+                        : type == 'Investment'
+                        ? Icons.trending_up_rounded
+                        : Icons.account_balance_wallet_rounded,
+                    color: subTextColor,
+                    size: 24,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -249,9 +383,22 @@ class WalletsScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Belum ada dompet $title', style: TextStyle(color: subTextColor, fontSize: 13, fontWeight: FontWeight.w600)),
+                      Text(
+                        'Belum ada dompet $title',
+                        style: TextStyle(
+                          color: subTextColor,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       const SizedBox(height: 4),
-                      Text('Ketuk + di pojok kanan atas untuk menambahkan', style: TextStyle(color: subTextColor.withValues(alpha: 0.6), fontSize: 11)),
+                      Text(
+                        'Ketuk + di pojok kanan atas untuk menambahkan',
+                        style: TextStyle(
+                          color: subTextColor.withValues(alpha: 0.6),
+                          fontSize: 11,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -274,7 +421,8 @@ class WalletsScreen extends StatelessWidget {
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
                     onTap: () {},
-                    onLongPress: () => _confirmDelete(context, provider, wallet),
+                    onLongPress: () =>
+                        _confirmDelete(context, provider, wallet),
                     child: Padding(
                       padding: const EdgeInsets.all(20),
                       child: Row(
@@ -285,7 +433,11 @@ class WalletsScreen extends StatelessWidget {
                               color: wallet.color.withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                             ),
-                            child: Icon(wallet.icon, color: wallet.color, size: 24),
+                            child: Icon(
+                              wallet.icon,
+                              color: wallet.color,
+                              size: 24,
+                            ),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -294,12 +446,21 @@ class WalletsScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   wallet.name,
-                                  style: TextStyle(color: textColor, fontSize: 15, fontWeight: FontWeight.w800),
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   '${wallet.type.toUpperCase()} • IDR',
-                                  style: TextStyle(color: subTextColor, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 0.5),
+                                  style: TextStyle(
+                                    color: subTextColor,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.5,
+                                  ),
                                 ),
                               ],
                             ),
@@ -309,12 +470,19 @@ class WalletsScreen extends StatelessWidget {
                             children: [
                               Text(
                                 'Saldo Saat Ini',
-                                style: TextStyle(color: subTextColor, fontSize: 10),
+                                style: TextStyle(
+                                  color: subTextColor,
+                                  fontSize: 10,
+                                ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 formatter.format(wallet.balance),
-                                style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w800),
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                ),
                               ),
                             ],
                           ),
@@ -326,20 +494,28 @@ class WalletsScreen extends StatelessWidget {
               );
             }).toList(),
           ),
-          if (wallets.isNotEmpty) const SizedBox(height: 12),
+        if (wallets.isNotEmpty) const SizedBox(height: 12),
       ],
     );
   }
 
-  void _confirmDelete(BuildContext context, AppProvider provider, Wallet wallet) {
+  void _confirmDelete(
+    BuildContext context,
+    AppProvider provider,
+    Wallet wallet,
+  ) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: Theme.of(context).cardColor,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
           title: const Text('Hapus Dompet?'),
-          content: Text('Apakah Anda yakin ingin menghapus "${wallet.name}"? Semua transaksi terkait juga akan dihapus.'),
+          content: Text(
+            'Apakah Anda yakin ingin menghapus "${wallet.name}"? Semua transaksi terkait juga akan dihapus.',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -350,7 +526,13 @@ class WalletsScreen extends StatelessWidget {
                 provider.deleteWallet(wallet.id);
                 Navigator.of(context).pop();
               },
-              child: const Text('Hapus', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+              child: const Text(
+                'Hapus',
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         );
@@ -377,15 +559,26 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
   bool _excludeFromTotal = false;
   bool _linkAsPocket = false;
 
-  final List<String> _types = ['Cash', 'Bank', 'E-Wallet', 'Credit Card', 'Investment'];
+  final List<String> _types = [
+    'Cash',
+    'Bank',
+    'E-Wallet',
+    'Credit Card',
+    'Investment',
+  ];
 
   String _getDisplayType(String type) {
     switch (type) {
-      case 'Cash': return 'Kas';
-      case 'Bank': return 'Akun Bank';
-      case 'Credit Card': return 'Kartu Kredit';
-      case 'Investment': return 'Investasi';
-      default: return type;
+      case 'Cash':
+        return 'Kas';
+      case 'Bank':
+        return 'Akun Bank';
+      case 'Credit Card':
+        return 'Kartu Kredit';
+      case 'Investment':
+        return 'Investasi';
+      default:
+        return type;
     }
   }
 
@@ -398,7 +591,8 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
-    final double balance = double.tryParse(_balanceController.text.replaceAll(',', '')) ?? 0.0;
+    final double balance =
+        double.tryParse(_balanceController.text.replaceAll(',', '')) ?? 0.0;
     final provider = Provider.of<AppProvider>(context, listen: false);
     provider.addWallet(
       name: _nameController.text.trim(),
@@ -414,12 +608,16 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
     final subTextColor = isDark ? Colors.white70 : const Color(0xFF64748B);
-    final scaffoldBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9);
+    final scaffoldBg = isDark
+        ? const Color(0xFF0F172A)
+        : const Color(0xFFF1F5F9);
     final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderCol = isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04);
+    final borderCol = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.04);
 
     return Scaffold(
       backgroundColor: scaffoldBg,
@@ -432,7 +630,12 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
         ),
         title: Text(
           'Tambah Dompet Baru',
-          style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.w800, fontFamily: 'Outfit'),
+          style: TextStyle(
+            color: textColor,
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            fontFamily: 'Outfit',
+          ),
         ),
         centerTitle: true,
         actions: [
@@ -456,19 +659,35 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
                 decoration: BoxDecoration(
                   color: Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                  border: Border.all(
+                    color: Colors.orange.withValues(alpha: 0.3),
+                  ),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.info_outline_rounded, color: Colors.orange, size: 20),
+                    Icon(
+                      Icons.info_outline_rounded,
+                      color: Colors.orange,
+                      size: 20,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Tidak ada template tersedia', style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.bold)),
+                          Text(
+                            'Tidak ada template tersedia',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           const SizedBox(height: 4),
-                          Text('Impor paket ikon di Pengaturan untuk melihat paket ikon bank/e-wallet', style: TextStyle(color: subTextColor, fontSize: 11)),
+                          Text(
+                            'Impor paket ikon di Pengaturan untuk melihat paket ikon bank/e-wallet',
+                            style: TextStyle(color: subTextColor, fontSize: 11),
+                          ),
                         ],
                       ),
                     ),
@@ -476,10 +695,17 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              
-              Text('Detail Dompet', style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w800)),
+
+              Text(
+                'Detail Dompet',
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
               const SizedBox(height: 16),
-              
+
               _buildLabel('Nama Dompet', subTextColor),
               const SizedBox(height: 8),
               TextFormField(
@@ -487,13 +713,23 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
                 style: TextStyle(color: textColor, fontSize: 14),
                 decoration: InputDecoration(
                   hintText: 'misal: BCA, GoPay, Tunai',
-                  hintStyle: TextStyle(color: subTextColor.withValues(alpha: 0.5)),
+                  hintStyle: TextStyle(
+                    color: subTextColor.withValues(alpha: 0.5),
+                  ),
                   filled: true,
                   fillColor: cardBg,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
-                validator: (val) => (val == null || val.trim().isEmpty) ? 'Masukkan nama dompet' : null,
+                validator: (val) => (val == null || val.trim().isEmpty)
+                    ? 'Masukkan nama dompet'
+                    : null,
               ),
               const SizedBox(height: 16),
 
@@ -501,25 +737,49 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(16)),
+                decoration: BoxDecoration(
+                  color: cardBg,
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(color: subTextColor.withValues(alpha: 0.1), shape: BoxShape.circle),
-                      child: Icon(Icons.public_rounded, color: subTextColor, size: 20),
+                      decoration: BoxDecoration(
+                        color: subTextColor.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.public_rounded,
+                        color: subTextColor,
+                        size: 20,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('IDR', style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                          Text('Indonesian Rupiah', style: TextStyle(color: subTextColor, fontSize: 11)),
+                          Text(
+                            'IDR',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Indonesian Rupiah',
+                            style: TextStyle(color: subTextColor, fontSize: 11),
+                          ),
                         ],
                       ),
                     ),
-                    Icon(Icons.chevron_right_rounded, color: subTextColor, size: 20),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: subTextColor,
+                      size: 20,
+                    ),
                   ],
                 ),
               ),
@@ -533,11 +793,19 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
                 style: TextStyle(color: textColor, fontSize: 14),
                 decoration: InputDecoration(
                   hintText: '0',
-                  hintStyle: TextStyle(color: subTextColor.withValues(alpha: 0.5)),
+                  hintStyle: TextStyle(
+                    color: subTextColor.withValues(alpha: 0.5),
+                  ),
                   filled: true,
                   fillColor: cardBg,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -553,42 +821,81 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
                       final isSelected = _selectedType == type;
                       return GestureDetector(
                         onTap: () => setState(() {
-                           _selectedType = type;
-                           if (type == 'Cash') { _selectedColor = const Color(0xFF66BB6A); _selectedIcon = Icons.payments_rounded; }
-                           if (type == 'Bank') { _selectedColor = const Color(0xFF42A5F5); _selectedIcon = Icons.account_balance_rounded; }
-                           if (type == 'E-Wallet') { _selectedColor = const Color(0xFFAB47BC); _selectedIcon = Icons.account_balance_wallet_rounded; }
-                           if (type == 'Credit Card') { _selectedColor = const Color(0xFFFF7043); _selectedIcon = Icons.credit_card_rounded; }
-                           if (type == 'Investment') { _selectedColor = const Color(0xFF26C6DA); _selectedIcon = Icons.trending_up_rounded; }
+                          _selectedType = type;
+                          if (type == 'Cash') {
+                            _selectedColor = const Color(0xFF66BB6A);
+                            _selectedIcon = Icons.payments_rounded;
+                          }
+                          if (type == 'Bank') {
+                            _selectedColor = const Color(0xFF42A5F5);
+                            _selectedIcon = Icons.account_balance_rounded;
+                          }
+                          if (type == 'E-Wallet') {
+                            _selectedColor = const Color(0xFFAB47BC);
+                            _selectedIcon =
+                                Icons.account_balance_wallet_rounded;
+                          }
+                          if (type == 'Credit Card') {
+                            _selectedColor = const Color(0xFFFF7043);
+                            _selectedIcon = Icons.credit_card_rounded;
+                          }
+                          if (type == 'Investment') {
+                            _selectedColor = const Color(0xFF26C6DA);
+                            _selectedIcon = Icons.trending_up_rounded;
+                          }
                         }),
                         child: Container(
                           margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                           decoration: BoxDecoration(
-                            color: isSelected ? theme.primaryColor.withValues(alpha: 0.1) : cardBg,
+                            color: isSelected
+                                ? theme.primaryColor.withValues(alpha: 0.1)
+                                : cardBg,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: isSelected ? theme.primaryColor : borderCol),
+                            border: Border.all(
+                              color: isSelected
+                                  ? theme.primaryColor
+                                  : borderCol,
+                            ),
                           ),
                           child: Row(
                             children: [
                               Icon(
-                                type == 'Cash' ? Icons.payments_rounded : type == 'Bank' ? Icons.account_balance_rounded : type == 'E-Wallet' ? Icons.account_balance_wallet_rounded : type == 'Investment' ? Icons.trending_up_rounded : Icons.credit_card_rounded,
+                                type == 'Cash'
+                                    ? Icons.payments_rounded
+                                    : type == 'Bank'
+                                    ? Icons.account_balance_rounded
+                                    : type == 'E-Wallet'
+                                    ? Icons.account_balance_wallet_rounded
+                                    : type == 'Investment'
+                                    ? Icons.trending_up_rounded
+                                    : Icons.credit_card_rounded,
                                 size: 16,
-                                color: isSelected ? theme.primaryColor : subTextColor,
+                                color: isSelected
+                                    ? theme.primaryColor
+                                    : subTextColor,
                               ),
                               const SizedBox(width: 8),
                               Text(
                                 _getDisplayType(type),
                                 style: TextStyle(
-                                  color: isSelected ? theme.primaryColor : textColor,
+                                  color: isSelected
+                                      ? theme.primaryColor
+                                      : textColor,
                                   fontSize: 12,
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
                                 ),
                               ),
                             ],
                           ),
                         ),
                       );
-                    }).toList(),
+                    }),
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -596,7 +903,11 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
                         shape: BoxShape.circle,
                         border: Border.all(color: borderCol),
                       ),
-                      child: Icon(Icons.shuffle_rounded, size: 16, color: subTextColor),
+                      child: Icon(
+                        Icons.shuffle_rounded,
+                        size: 16,
+                        color: subTextColor,
+                      ),
                     ),
                   ],
                 ),
@@ -605,23 +916,51 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
 
               // Switches
               Container(
-                decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(16), border: Border.all(color: borderCol)),
+                decoration: BoxDecoration(
+                  color: cardBg,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: borderCol),
+                ),
                 child: SwitchListTile(
-                  title: Text('Kecualikan dari Total', style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.bold)),
-                  subtitle: Text('Saldo dompet ini tidak dihitung ke total saldo utama.', style: TextStyle(color: subTextColor, fontSize: 11)),
+                  title: Text(
+                    'Kecualikan dari Total',
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Saldo dompet ini tidak dihitung ke total saldo utama.',
+                    style: TextStyle(color: subTextColor, fontSize: 11),
+                  ),
                   value: _excludeFromTotal,
-                  activeColor: theme.primaryColor,
+                  activeThumbColor: theme.primaryColor,
                   onChanged: (val) => setState(() => _excludeFromTotal = val),
                 ),
               ),
               const SizedBox(height: 12),
               Container(
-                decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(16), border: Border.all(color: borderCol)),
+                decoration: BoxDecoration(
+                  color: cardBg,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: borderCol),
+                ),
                 child: SwitchListTile(
-                  title: Text('Hubungkan sebagai Pocket?', style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.bold)),
-                  subtitle: Text('Jadikan ini sub-akun dari wallet lain', style: TextStyle(color: subTextColor, fontSize: 11)),
+                  title: Text(
+                    'Hubungkan sebagai Pocket?',
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Jadikan ini sub-akun dari wallet lain',
+                    style: TextStyle(color: subTextColor, fontSize: 11),
+                  ),
                   value: _linkAsPocket,
-                  activeColor: theme.primaryColor,
+                  activeThumbColor: theme.primaryColor,
                   onChanged: (val) => setState(() => _linkAsPocket = val),
                 ),
               ),

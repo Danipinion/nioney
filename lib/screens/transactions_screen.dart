@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/app_provider.dart';
 import '../models/transaction.dart';
-import '../models/category.dart';
 import '../widgets/transaction_item.dart';
 import 'add_transaction_screen.dart';
 
@@ -26,25 +25,35 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
     // Filter by Type
     if (_transactionType == 'income') {
-      filtered = filtered.where((tx) => !tx.isExpense && tx.categoryId != 'sys_transfer').toList();
+      filtered = filtered
+          .where((tx) => !tx.isExpense && tx.categoryId != 'sys_transfer')
+          .toList();
     } else if (_transactionType == 'expense') {
-      filtered = filtered.where((tx) => tx.isExpense && tx.categoryId != 'sys_transfer').toList();
+      filtered = filtered
+          .where((tx) => tx.isExpense && tx.categoryId != 'sys_transfer')
+          .toList();
     }
 
     // Filter by Category
     if (_selectedCategoryId != 'all') {
-      filtered = filtered.where((tx) => tx.categoryId == _selectedCategoryId).toList();
+      filtered = filtered
+          .where((tx) => tx.categoryId == _selectedCategoryId)
+          .toList();
     }
-    
+
     // Filter by Subcategory
     if (_selectedSubCategory != 'all') {
-      filtered = filtered.where((tx) => tx.subCategory == _selectedSubCategory).toList();
+      filtered = filtered
+          .where((tx) => tx.subCategory == _selectedSubCategory)
+          .toList();
     }
 
     // Filter by Frequency
     if (_selectedFrequency == 'Hari') {
       filtered = filtered.where((tx) {
-        return tx.date.year == now.year && tx.date.month == now.month && tx.date.day == now.day;
+        return tx.date.year == now.year &&
+            tx.date.month == now.month &&
+            tx.date.day == now.day;
       }).toList();
     } else if (_selectedFrequency == 'Minggu') {
       final todayMidnight = DateTime(now.year, now.month, now.day, 23, 59, 59);
@@ -65,7 +74,13 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     return filtered;
   }
 
-  Widget _buildFilterChip(String label, bool isSelected, VoidCallback onTap, ThemeData theme, bool isDark) {
+  Widget _buildFilterChip(
+    String label,
+    bool isSelected,
+    VoidCallback onTap,
+    ThemeData theme,
+    bool isDark,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -73,20 +88,20 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected 
+          color: isSelected
               ? (isDark ? Colors.white : const Color(0xFF0F172A))
               : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected 
-                ? Colors.transparent 
+            color: isSelected
+                ? Colors.transparent
                 : (isDark ? Colors.white24 : Colors.black12),
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected 
+            color: isSelected
                 ? (isDark ? const Color(0xFF0F172A) : Colors.white)
                 : (isDark ? Colors.white70 : const Color(0xFF64748B)),
             fontSize: 12,
@@ -104,8 +119,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     final mainTextColor = isDark ? Colors.white : const Color(0xFF0F172A);
     final subTextColor = isDark ? Colors.white70 : const Color(0xFF64748B);
     final inputBg = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderCol = isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.04);
-    
+    final borderCol = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.04);
+
     final provider = Provider.of<AppProvider>(context);
     final filteredTransactions = _getFilteredTransactions(provider);
 
@@ -132,7 +149,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: mainTextColor, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: mainTextColor,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -144,9 +165,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
             decoration: BoxDecoration(
               color: theme.appBarTheme.backgroundColor,
-              border: Border(
-                bottom: BorderSide(color: borderCol, width: 1),
-              ),
+              border: Border(bottom: BorderSide(color: borderCol, width: 1)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,22 +176,55 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   physics: const BouncingScrollPhysics(),
                   child: Row(
                     children: [
-                      _buildFilterChip('Hari', _selectedFrequency == 'Hari', () => setState(() => _selectedFrequency = 'Hari'), theme, isDark),
-                      _buildFilterChip('Minggu', _selectedFrequency == 'Minggu', () => setState(() => _selectedFrequency = 'Minggu'), theme, isDark),
-                      _buildFilterChip('Bulan', _selectedFrequency == 'Bulan', () => setState(() => _selectedFrequency = 'Bulan'), theme, isDark),
-                      _buildFilterChip('Tahun', _selectedFrequency == 'Tahun', () => setState(() => _selectedFrequency = 'Tahun'), theme, isDark),
-                      _buildFilterChip('Semua', _selectedFrequency == 'Semua', () => setState(() => _selectedFrequency = 'Semua'), theme, isDark),
+                      _buildFilterChip(
+                        'Hari',
+                        _selectedFrequency == 'Hari',
+                        () => setState(() => _selectedFrequency = 'Hari'),
+                        theme,
+                        isDark,
+                      ),
+                      _buildFilterChip(
+                        'Minggu',
+                        _selectedFrequency == 'Minggu',
+                        () => setState(() => _selectedFrequency = 'Minggu'),
+                        theme,
+                        isDark,
+                      ),
+                      _buildFilterChip(
+                        'Bulan',
+                        _selectedFrequency == 'Bulan',
+                        () => setState(() => _selectedFrequency = 'Bulan'),
+                        theme,
+                        isDark,
+                      ),
+                      _buildFilterChip(
+                        'Tahun',
+                        _selectedFrequency == 'Tahun',
+                        () => setState(() => _selectedFrequency = 'Tahun'),
+                        theme,
+                        isDark,
+                      ),
+                      _buildFilterChip(
+                        'Semua',
+                        _selectedFrequency == 'Semua',
+                        () => setState(() => _selectedFrequency = 'Semua'),
+                        theme,
+                        isDark,
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Type & Category
                 Row(
                   children: [
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: inputBg,
                           borderRadius: BorderRadius.circular(16),
@@ -183,14 +235,46 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                             value: _transactionType,
                             dropdownColor: theme.cardColor,
                             isExpanded: true,
-                            icon: Icon(Icons.keyboard_arrow_down_rounded, color: subTextColor, size: 20),
+                            icon: Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: subTextColor,
+                              size: 20,
+                            ),
                             items: const <DropdownMenuItem<String>>[
-                              DropdownMenuItem<String>(value: 'all', child: Text('Semua Tipe', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600))),
-                              DropdownMenuItem<String>(value: 'income', child: Text('Pemasukan', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600))),
-                              DropdownMenuItem<String>(value: 'expense', child: Text('Pengeluaran', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600))),
+                              DropdownMenuItem<String>(
+                                value: 'all',
+                                child: Text(
+                                  'Semua Tipe',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              DropdownMenuItem<String>(
+                                value: 'income',
+                                child: Text(
+                                  'Pemasukan',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              DropdownMenuItem<String>(
+                                value: 'expense',
+                                child: Text(
+                                  'Pengeluaran',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
                             ],
                             onChanged: (val) {
-                              if (val != null) setState(() => _transactionType = val);
+                              if (val != null)
+                                setState(() => _transactionType = val);
                             },
                           ),
                         ),
@@ -199,7 +283,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: inputBg,
                           borderRadius: BorderRadius.circular(16),
@@ -210,34 +297,57 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                             value: _selectedCategoryId,
                             dropdownColor: theme.cardColor,
                             isExpanded: true,
-                            icon: Icon(Icons.keyboard_arrow_down_rounded, color: subTextColor, size: 20),
+                            icon: Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: subTextColor,
+                              size: 20,
+                            ),
                             items: <DropdownMenuItem<String>>[
-                              const DropdownMenuItem<String>(value: 'all', child: Text('Semua Kategori', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600))),
-                              ...provider.categories.where((c) => !c.id.startsWith('sys_')).map<DropdownMenuItem<String>>((cat) {
-                                return DropdownMenuItem<String>(
-                                  value: cat.id,
-                                  child: Row(
-                                    children: [
-                                      Icon(cat.icon, color: cat.color, size: 14),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          cat.name,
-                                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
+                              const DropdownMenuItem<String>(
+                                value: 'all',
+                                child: Text(
+                                  'Semua Kategori',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
                                   ),
-                                );
-                              }),
+                                ),
+                              ),
+                              ...provider.categories
+                                  .where((c) => !c.id.startsWith('sys_'))
+                                  .map<DropdownMenuItem<String>>((cat) {
+                                    return DropdownMenuItem<String>(
+                                      value: cat.id,
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            cat.icon,
+                                            color: cat.color,
+                                            size: 14,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              cat.name,
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }),
                             ],
                             onChanged: (val) {
                               if (val != null) {
                                 setState(() {
                                   _selectedCategoryId = val;
-                                  _selectedSubCategory = 'all'; // Reset subcategory when category changes
+                                  _selectedSubCategory =
+                                      'all'; // Reset subcategory when category changes
                                 });
                               }
                             },
@@ -252,7 +362,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 if (_selectedCategoryId != 'all')
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: inputBg,
                       borderRadius: BorderRadius.circular(16),
@@ -263,33 +376,55 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         value: _selectedSubCategory,
                         dropdownColor: theme.cardColor,
                         isExpanded: true,
-                        icon: Icon(Icons.keyboard_arrow_down_rounded, color: subTextColor, size: 20),
+                        icon: Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: subTextColor,
+                          size: 20,
+                        ),
                         items: <DropdownMenuItem<String>>[
-                          const DropdownMenuItem<String>(value: 'all', child: Text('Semua Sub Kategori', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600))),
-                          ...provider.getSubCategoriesForCategory(_selectedCategoryId)
+                          const DropdownMenuItem<String>(
+                            value: 'all',
+                            child: Text(
+                              'Semua Sub Kategori',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          ...provider
+                              .getSubCategoriesForCategory(_selectedCategoryId)
                               .where((s) => s != null)
                               .map<DropdownMenuItem<String>>((subName) {
-                            return DropdownMenuItem<String>(
-                              value: subName.toString(),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.subdirectory_arrow_right_rounded, color: subTextColor, size: 14),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      subName.toString(),
-                                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                                return DropdownMenuItem<String>(
+                                  value: subName.toString(),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.subdirectory_arrow_right_rounded,
+                                        color: subTextColor,
+                                        size: 14,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          subName.toString(),
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            );
-                          }),
+                                );
+                              }),
                         ],
                         onChanged: (val) {
-                          if (val != null) setState(() => _selectedSubCategory = val);
+                          if (val != null)
+                            setState(() => _selectedSubCategory = val);
                         },
                       ),
                     ),
@@ -297,7 +432,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               ],
             ),
           ),
-          
+
           // List View
           Expanded(
             child: filteredTransactions.isEmpty
@@ -305,7 +440,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.search_off_rounded, size: 60, color: subTextColor.withValues(alpha: 0.3)),
+                        Icon(
+                          Icons.search_off_rounded,
+                          size: 60,
+                          color: subTextColor.withValues(alpha: 0.3),
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           'Tidak ada transaksi',
@@ -349,7 +488,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                             context: context,
                             isScrollControlled: true,
                             backgroundColor: Colors.transparent,
-                            builder: (context) => AddTransactionScreen(editItem: tx),
+                            builder: (context) =>
+                                AddTransactionScreen(editItem: tx),
                           );
                         },
                       );
