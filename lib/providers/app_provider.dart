@@ -9,6 +9,7 @@ import '../models/budget.dart';
 import '../models/recurring_transaction.dart';
 import '../models/savings_target.dart';
 import '../models/bill.dart';
+import '../models/debt.dart';
 
 class AppProvider with ChangeNotifier {
   static const String _prefTransactionsKey = 'nioney_transactions';
@@ -22,6 +23,7 @@ class AppProvider with ChangeNotifier {
   static const String _prefSubCategoriesKey = 'nioney_subcategories';
   static const String _prefSavingsTargetsKey = 'nioney_savings_targets';
   static const String _prefBillsKey = 'nioney_bills';
+  static const String _prefDebtsKey = 'nioney_debts';
 
   final _uuid = const Uuid();
 
@@ -33,6 +35,7 @@ class AppProvider with ChangeNotifier {
   List<RecurringTransaction> _recurringTransactions = [];
   List<SavingsTarget> _savingsTargets = [];
   List<Bill> _bills = [];
+  List<Debt> _debts = [];
 
   ThemeMode _themeMode = ThemeMode.dark;
   String _currentPalette = 'Deep Sapphire';
@@ -47,6 +50,7 @@ class AppProvider with ChangeNotifier {
   List<RecurringTransaction> get recurringTransactions => _recurringTransactions;
   List<SavingsTarget> get savingsTargets => _savingsTargets;
   List<Bill> get bills => _bills;
+  List<Debt> get debts => _debts;
   ThemeMode get themeMode => _themeMode;
   String get currentPalette => _currentPalette;
   String get currencySymbol => _currencySymbol;
@@ -244,6 +248,19 @@ class AppProvider with ChangeNotifier {
       _bills = [];
     }
 
+    // 10. Load Debts
+    final debtsJson = prefs.getString(_prefDebtsKey);
+    if (debtsJson != null) {
+      try {
+        final List<dynamic> decoded = jsonDecode(debtsJson);
+        _debts = decoded.map((d) => Debt.fromJson(d)).toList();
+      } catch (e) {
+        _debts = [];
+      }
+    } else {
+      _debts = [];
+    }
+
     notifyListeners();
   }
 
@@ -251,6 +268,12 @@ class AppProvider with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final String jsonStr = jsonEncode(_bills.map((b) => b.toJson()).toList());
     await prefs.setString(_prefBillsKey, jsonStr);
+  }
+
+  Future<void> _saveDebts() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String jsonStr = jsonEncode(_debts.map((d) => d.toJson()).toList());
+    await prefs.setString(_prefDebtsKey, jsonStr);
   }
 
   // Save data to SharedPreferences
@@ -951,6 +974,106 @@ class AppProvider with ChangeNotifier {
   Future<void> deleteBill(String id) async {
     _bills.removeWhere((b) => b.id == id);
     await _saveBills();
+    notifyListeners();
+  }
+
+  // Debt Management Methods
+  Future<void> addDebt({
+    required String name,
+    required double amount,
+    required bool isDebt,
+    required DateTime date,
+    DateTime? dueDate,
+    String note = '',
+    String? walletId,
+  }) async {
+    final id = _uuid.v4();
+    final newDebt = Debt(
+      id: id,
+      name: name,
+      amount: amount,
+      paidAmount: 0.0,
+      isDebt: isDebt,
+      date: date,
+      dueDate: dueDate,
+      note: note,
+      walletId: walletId,
+    );
+
+    _debts.add(newDebt);
+    await _saveDebts();
+
+    // If wallet is selected, adjust wallet balance and add transaction
+    if (walletId != null) {
+      final txTitle = isDebt ? 'Pinjam dari: $name' : 'Pinjamkan ke: $name';
+      final tx = Transaction(
+        id: _uuid.v4(),
+        title: txTitle,
+        amount: amount,
+        isExpense: !isDebt, // Utang is income, Piutang is expense
+        categoryId: 'sys_debt',
+        subCategory: name,
+        walletId: walletId,
+        date: date,
+        note: note.isNotEmpty ? note : (isDebt ? 'Mencatat utang' : 'Mencatat piutang'),
+      );
+      _transactions.insert(0, tx);
+      await _saveTransactions();
+
+      // Update wallet balance (Utang increases balance, Piutang decreases balance)
+      _updateWalletBalance(walletId, isDebt ? amount : -amount);
+      await _saveWallets();
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> addDebtInstallment({
+    required String debtId,
+    required double installmentAmount,
+    required String walletId,
+    required DateTime paymentDate,
+    String note = '',
+  }) async {
+    final idx = _debts.indexWhere((d) => d.id == debtId);
+    if (idx == -1) return;
+
+    final debt = _debts[idx];
+    final newPaidAmount = (debt.paidAmount + installmentAmount).clamp(0.0, debt.amount);
+    final actualInstallment = newPaidAmount - debt.paidAmount;
+
+    if (actualInstallment <= 0) return;
+
+    _debts[idx] = debt.copyWith(paidAmount: newPaidAmount);
+    await _saveDebts();
+
+    // Create system transaction
+    final txTitle = debt.isDebt ? 'Bayar Utang: ${debt.name}' : 'Cicilan Piutang: ${debt.name}';
+    final tx = Transaction(
+      id: _uuid.v4(),
+      title: txTitle,
+      amount: actualInstallment,
+      isExpense: debt.isDebt,
+      categoryId: 'sys_debt',
+      subCategory: debt.name,
+      walletId: walletId,
+      date: paymentDate,
+      note: note.isNotEmpty ? note : 'Bayar cicilan utang/piutang',
+    );
+
+    _transactions.insert(0, tx);
+    await _saveTransactions();
+
+    // Update wallet balance
+    _updateWalletBalance(walletId, debt.isDebt ? -actualInstallment : actualInstallment);
+    await _saveWallets();
+
+    notifyListeners();
+  }
+
+  Future<void> deleteDebt(String id) async {
+    _debts.removeWhere((d) => d.id == id);
+    await _saveDebts();
     notifyListeners();
   }
 }
