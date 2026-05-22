@@ -8,7 +8,14 @@ import '../models/transaction.dart';
 
 class AddTransactionScreen extends StatefulWidget {
   final Transaction? editItem;
-  const AddTransactionScreen({super.key, this.editItem});
+  final String? initialWalletId;
+  final int? initialTypeIndex;
+  const AddTransactionScreen({
+    super.key,
+    this.editItem,
+    this.initialWalletId,
+    this.initialTypeIndex,
+  });
 
   @override
   State<AddTransactionScreen> createState() => _AddTransactionScreenState();
@@ -107,9 +114,16 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       } else {
         if (provider.wallets.isNotEmpty) {
           setState(() {
-            _selectedWalletId = provider.wallets.first.id;
+            _selectedWalletId = widget.initialWalletId ?? provider.wallets.first.id;
+            if (widget.initialTypeIndex != null) {
+              _transactionTypeIndex = widget.initialTypeIndex!;
+            }
             if (provider.wallets.length > 1) {
-              _destinationWalletId = provider.wallets[1].id;
+              if (_selectedWalletId == provider.wallets.first.id) {
+                _destinationWalletId = provider.wallets[1].id;
+              } else {
+                _destinationWalletId = provider.wallets.first.id;
+              }
             } else {
               _destinationWalletId = provider.wallets.first.id;
             }

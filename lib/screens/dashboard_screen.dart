@@ -8,6 +8,7 @@ import 'savings_target_detail_screen.dart';
 import '../widgets/transaction_item.dart';
 import 'add_transaction_screen.dart';
 import 'transactions_screen.dart';
+import 'wallet_detail_screen.dart';
 import 'budgets_screen.dart';
 import 'recurring_screen.dart';
 import 'savings_targets_screen.dart';
@@ -871,14 +872,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               right: index == totalCount - 1 ? 0 : 12,
                             ),
                             child: isWallet
-                                ? _buildCustomWalletCard(
-                                    context,
-                                    provider.wallets[index],
-                                    cardBgColor,
-                                    borderColor,
-                                    mainTextColor,
-                                    subTextColor,
-                                    numberFormat,
+                                ? GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => WalletDetailScreen(walletId: provider.wallets[index].id),
+                                        ),
+                                      );
+                                    },
+                                    child: _buildCustomWalletCard(
+                                      context,
+                                      provider.wallets[index],
+                                      cardBgColor,
+                                      borderColor,
+                                      mainTextColor,
+                                      subTextColor,
+                                      numberFormat,
+                                    ),
                                   )
                                 : GestureDetector(
                                     onTap: () {
