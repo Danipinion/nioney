@@ -8,6 +8,7 @@ import '../models/transaction.dart';
 import '../models/budget.dart';
 import '../models/recurring_transaction.dart';
 import '../models/savings_target.dart';
+import '../models/bill.dart';
 
 class AppProvider with ChangeNotifier {
   static const String _prefTransactionsKey = 'nioney_transactions';
@@ -20,6 +21,7 @@ class AppProvider with ChangeNotifier {
   static const String _prefCategoriesKey = 'nioney_categories';
   static const String _prefSubCategoriesKey = 'nioney_subcategories';
   static const String _prefSavingsTargetsKey = 'nioney_savings_targets';
+  static const String _prefBillsKey = 'nioney_bills';
 
   final _uuid = const Uuid();
 
@@ -30,6 +32,7 @@ class AppProvider with ChangeNotifier {
   List<Budget> _budgets = [];
   List<RecurringTransaction> _recurringTransactions = [];
   List<SavingsTarget> _savingsTargets = [];
+  List<Bill> _bills = [];
 
   ThemeMode _themeMode = ThemeMode.dark;
   String _currentPalette = 'Deep Sapphire';
@@ -43,6 +46,7 @@ class AppProvider with ChangeNotifier {
   List<Budget> get budgets => _budgets;
   List<RecurringTransaction> get recurringTransactions => _recurringTransactions;
   List<SavingsTarget> get savingsTargets => _savingsTargets;
+  List<Bill> get bills => _bills;
   ThemeMode get themeMode => _themeMode;
   String get currentPalette => _currentPalette;
   String get currencySymbol => _currencySymbol;
@@ -227,7 +231,26 @@ class AppProvider with ChangeNotifier {
       _savingsTargets = [];
     }
 
+    // 9. Load Bills
+    final billsJson = prefs.getString(_prefBillsKey);
+    if (billsJson != null) {
+      try {
+        final List<dynamic> decoded = jsonDecode(billsJson);
+        _bills = decoded.map((b) => Bill.fromJson(b)).toList();
+      } catch (e) {
+        _bills = [];
+      }
+    } else {
+      _bills = [];
+    }
+
     notifyListeners();
+  }
+
+  Future<void> _saveBills() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String jsonStr = jsonEncode(_bills.map((b) => b.toJson()).toList());
+    await prefs.setString(_prefBillsKey, jsonStr);
   }
 
   // Save data to SharedPreferences
@@ -849,5 +872,85 @@ class AppProvider with ChangeNotifier {
     await _saveWallets();
     await _saveSavingsTargets();
     await _saveTransactions();
+  }
+
+  // Bills Management Methods
+  Future<void> addBill({
+    required String title,
+    required double amount,
+    required DateTime dueDate,
+    required String categoryId,
+    required String subCategory,
+    String? walletId,
+  }) async {
+    final bill = Bill(
+      id: _uuid.v4(),
+      title: title,
+      amount: amount,
+      dueDate: dueDate,
+      isPaid: false,
+      categoryId: categoryId,
+      subCategory: subCategory,
+      walletId: walletId,
+    );
+    _bills.add(bill);
+    await _saveBills();
+    notifyListeners();
+  }
+
+  Future<void> updateBill(Bill updatedBill) async {
+    final idx = _bills.indexWhere((b) => b.id == updatedBill.id);
+    if (idx != -1) {
+      _bills[idx] = updatedBill;
+      await _saveBills();
+      notifyListeners();
+    }
+  }
+
+  Future<void> payBill({
+    required String billId,
+    required String walletId,
+    required DateTime paidDate,
+  }) async {
+    final idx = _bills.indexWhere((b) => b.id == billId);
+    if (idx != -1) {
+      final bill = _bills[idx];
+      
+      // 1. Create a transaction
+      final txId = _uuid.v4();
+      final tx = Transaction(
+        id: txId,
+        title: 'Pembayaran: ${bill.title}',
+        amount: bill.amount,
+        isExpense: true,
+        categoryId: bill.categoryId,
+        subCategory: bill.subCategory,
+        walletId: walletId,
+        date: paidDate,
+        note: 'Dibayar dari menu Tagihan',
+      );
+      
+      // 2. Add to transaction list and update wallet balance
+      _transactions.insert(0, tx);
+      await _saveTransactions();
+      _updateWalletBalance(walletId, -bill.amount);
+      await _saveWallets();
+
+      // 3. Mark the bill as paid
+      _bills[idx] = bill.copyWith(
+        isPaid: true,
+        paidDate: paidDate,
+        paymentTransactionId: txId,
+        walletId: walletId,
+      );
+      await _saveBills();
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteBill(String id) async {
+    _bills.removeWhere((b) => b.id == id);
+    await _saveBills();
+    notifyListeners();
   }
 }
