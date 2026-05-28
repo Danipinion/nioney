@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/app_provider.dart';
-import '../theme/app_theme.dart';
 import 'categories_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -204,114 +203,114 @@ class SettingsScreen extends StatelessWidget {
                   clipBehavior: Clip.antiAlias,
                   child: Column(
                     children: [
-                    // Currency
-                    ListTile(
-                      leading: Icon(
-                        Icons.monetization_on_rounded,
-                        color: theme.primaryColor,
-                        size: 20,
-                      ),
-                      title: Text(
-                        'Currency Symbol',
-                        style: TextStyle(
-                          color: mainTextColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
+                      // Currency
+                      ListTile(
+                        leading: Icon(
+                          Icons.monetization_on_rounded,
+                          color: theme.primaryColor,
+                          size: 20,
                         ),
-                      ),
-                      subtitle: Text(
-                        'Change symbols displayed across numbers.',
-                        style: TextStyle(color: subTextColor, fontSize: 11),
-                      ),
-                      trailing: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.04)
-                              : Colors.black.withValues(alpha: 0.04),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          provider.currencySymbol,
+                        title: Text(
+                          'Currency Symbol',
                           style: TextStyle(
-                            color: theme.primaryColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                            color: mainTextColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
+                        subtitle: Text(
+                          'Change symbols displayed across numbers.',
+                          style: TextStyle(color: subTextColor, fontSize: 11),
+                        ),
+                        trailing: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.04)
+                                : Colors.black.withValues(alpha: 0.04),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            provider.currencySymbol,
+                            style: TextStyle(
+                              color: theme.primaryColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        onTap: () => _showCurrencyPicker(context, provider),
                       ),
-                      onTap: () => _showCurrencyPicker(context, provider),
-                    ),
-                     Divider(color: borderColor, height: 1, indent: 56),
-                    // Theme toggler (Information block)
-                    ListTile(
-                      leading: Icon(
-                        Icons.dark_mode_rounded,
-                        color: theme.primaryColor,
-                        size: 20,
-                      ),
-                      title: Text(
-                        'Display Mode',
-                        style: TextStyle(
-                          color: mainTextColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
+                      Divider(color: borderColor, height: 1, indent: 56),
+                      // Theme toggler (Information block)
+                      ListTile(
+                        leading: Icon(
+                          Icons.dark_mode_rounded,
+                          color: theme.primaryColor,
+                          size: 20,
+                        ),
+                        title: Text(
+                          'Display Mode',
+                          style: TextStyle(
+                            color: mainTextColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        subtitle: Text(
+                          'Force light theme or stick to battery-saving dark.',
+                          style: TextStyle(color: subTextColor, fontSize: 11),
+                        ),
+                        trailing: Switch(
+                          value: provider.themeMode == ThemeMode.dark,
+                          activeThumbColor: theme.primaryColor,
+                          onChanged: (val) {
+                            provider.setThemeMode(
+                              val ? ThemeMode.dark : ThemeMode.light,
+                            );
+                          },
                         ),
                       ),
-                      subtitle: Text(
-                        'Force light theme or stick to battery-saving dark.',
-                        style: TextStyle(color: subTextColor, fontSize: 11),
-                      ),
-                      trailing: Switch(
-                        value: provider.themeMode == ThemeMode.dark,
-                        activeThumbColor: theme.primaryColor,
-                        onChanged: (val) {
-                          provider.setThemeMode(
-                            val ? ThemeMode.dark : ThemeMode.light,
+                      Divider(color: borderColor, height: 1, indent: 56),
+                      // Kelola Kategori
+                      ListTile(
+                        leading: Icon(
+                          Icons.category_rounded,
+                          color: theme.primaryColor,
+                          size: 20,
+                        ),
+                        title: Text(
+                          'Kelola Kategori',
+                          style: TextStyle(
+                            color: mainTextColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        subtitle: Text(
+                          'Atur kategori pemasukan, pengeluaran & sistem.',
+                          style: TextStyle(color: subTextColor, fontSize: 11),
+                        ),
+                        trailing: Icon(
+                          Icons.keyboard_arrow_right_rounded,
+                          color: subTextColor,
+                          size: 20,
+                        ),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const CategoriesScreen(),
+                            ),
                           );
                         },
                       ),
-                    ),
-                    Divider(color: borderColor, height: 1, indent: 56),
-                    // Kelola Kategori
-                    ListTile(
-                      leading: Icon(
-                        Icons.category_rounded,
-                        color: theme.primaryColor,
-                        size: 20,
-                      ),
-                      title: Text(
-                        'Kelola Kategori',
-                        style: TextStyle(
-                          color: mainTextColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      subtitle: Text(
-                        'Atur kategori pemasukan, pengeluaran & sistem.',
-                        style: TextStyle(color: subTextColor, fontSize: 11),
-                      ),
-                      trailing: Icon(
-                        Icons.keyboard_arrow_right_rounded,
-                        color: subTextColor,
-                        size: 20,
-                      ),
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const CategoriesScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
               const SizedBox(height: 24),
 
               // Danger Zone

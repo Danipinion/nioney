@@ -273,8 +273,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                               ),
                             ],
                             onChanged: (val) {
-                              if (val != null)
+                              if (val != null) {
                                 setState(() => _transactionType = val);
+                              }
                             },
                           ),
                         ),
@@ -423,8 +424,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                               }),
                         ],
                         onChanged: (val) {
-                          if (val != null)
+                          if (val != null) {
                             setState(() => _selectedSubCategory = val);
+                          }
                         },
                       ),
                     ),

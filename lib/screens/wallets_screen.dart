@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/app_provider.dart';
 import '../models/wallet.dart';
-import '../models/savings_target.dart';
 import 'savings_targets_screen.dart';
 import 'savings_target_detail_screen.dart';
 import 'wallet_detail_screen.dart';
@@ -36,7 +35,10 @@ class WalletsScreen extends StatelessWidget {
 
     // Calculate totals
     double totalBalance = provider.wallets.fold(0, (sum, w) => sum + w.balance);
-    double totalSavings = provider.savingsTargets.fold(0.0, (sum, t) => sum + t.savedAmount);
+    double totalSavings = provider.savingsTargets.fold(
+      0.0,
+      (sum, t) => sum + t.savedAmount,
+    );
     final formatter = NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp',
@@ -438,7 +440,8 @@ class WalletsScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => WalletDetailScreen(walletId: wallet.id),
+                          builder: (context) =>
+                              WalletDetailScreen(walletId: wallet.id),
                         ),
                       );
                     },
@@ -591,7 +594,9 @@ class WalletsScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SavingsTargetsScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const SavingsTargetsScreen(),
+                  ),
                 );
               },
               child: Text(
@@ -661,7 +666,9 @@ class WalletsScreen extends StatelessWidget {
           Column(
             children: targets.map((target) {
               final isAchieved = target.isAchieved;
-              final progress = target.targetAmount > 0 ? (target.savedAmount / target.targetAmount).clamp(0.0, 1.0) : 0.0;
+              final progress = target.targetAmount > 0
+                  ? (target.savedAmount / target.targetAmount).clamp(0.0, 1.0)
+                  : 0.0;
 
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
@@ -679,7 +686,8 @@ class WalletsScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SavingsTargetDetailScreen(targetId: target.id),
+                          builder: (context) =>
+                              SavingsTargetDetailScreen(targetId: target.id),
                         ),
                       );
                     },
@@ -720,17 +728,28 @@ class WalletsScreen extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 8),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: isAchieved
-                                            ? const Color(0xFF00D179).withValues(alpha: 0.12)
-                                            : Colors.amber.withValues(alpha: 0.12),
+                                            ? const Color(
+                                                0xFF00D179,
+                                              ).withValues(alpha: 0.12)
+                                            : Colors.amber.withValues(
+                                                alpha: 0.12,
+                                              ),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Text(
-                                        isAchieved ? 'Tercapai' : 'Belum Tercapai',
+                                        isAchieved
+                                            ? 'Tercapai'
+                                            : 'Belum Tercapai',
                                         style: TextStyle(
-                                          color: isAchieved ? const Color(0xFF00D179) : Colors.amber,
+                                          color: isAchieved
+                                              ? const Color(0xFF00D179)
+                                              : Colors.amber,
                                           fontSize: 9,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -743,8 +762,14 @@ class WalletsScreen extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(4),
                                   child: LinearProgressIndicator(
                                     value: progress,
-                                    backgroundColor: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.04),
-                                    valueColor: AlwaysStoppedAnimation<Color>(isAchieved ? const Color(0xFF00D179) : target.color),
+                                    backgroundColor: isDark
+                                        ? Colors.white.withValues(alpha: 0.04)
+                                        : Colors.black.withValues(alpha: 0.04),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      isAchieved
+                                          ? const Color(0xFF00D179)
+                                          : target.color,
+                                    ),
                                     minHeight: 4,
                                   ),
                                 ),

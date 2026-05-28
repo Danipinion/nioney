@@ -12,7 +12,8 @@ class SavingsTargetDetailScreen extends StatefulWidget {
   const SavingsTargetDetailScreen({super.key, required this.targetId});
 
   @override
-  State<SavingsTargetDetailScreen> createState() => _SavingsTargetDetailScreenState();
+  State<SavingsTargetDetailScreen> createState() =>
+      _SavingsTargetDetailScreenState();
 }
 
 class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
@@ -46,7 +47,9 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   color: sheetBg,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
                 ),
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
@@ -75,10 +78,7 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                     ),
                     Text(
                       target.title,
-                      style: TextStyle(
-                        color: subColor,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: subColor, fontSize: 12),
                     ),
                     const SizedBox(height: 16),
 
@@ -93,18 +93,24 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                               padding: const EdgeInsets.symmetric(vertical: 10),
                               decoration: BoxDecoration(
                                 color: isDeposit
-                                    ? const Color(0xFF00D179).withValues(alpha: 0.12)
+                                    ? const Color(
+                                        0xFF00D179,
+                                      ).withValues(alpha: 0.12)
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: isDeposit ? const Color(0xFF00D179) : Colors.transparent,
+                                  color: isDeposit
+                                      ? const Color(0xFF00D179)
+                                      : Colors.transparent,
                                   width: 1.5,
                                 ),
                               ),
                               child: Text(
                                 'Setor Tabungan',
                                 style: TextStyle(
-                                  color: isDeposit ? const Color(0xFF00D179) : subColor,
+                                  color: isDeposit
+                                      ? const Color(0xFF00D179)
+                                      : subColor,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
                                 ),
@@ -125,14 +131,18 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: !isDeposit ? Colors.redAccent : Colors.transparent,
+                                  color: !isDeposit
+                                      ? Colors.redAccent
+                                      : Colors.transparent,
                                   width: 1.5,
                                 ),
                               ),
                               child: Text(
                                 'Tarik Uang',
                                 style: TextStyle(
-                                  color: !isDeposit ? Colors.redAccent : subColor,
+                                  color: !isDeposit
+                                      ? Colors.redAccent
+                                      : subColor,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
                                 ),
@@ -146,22 +156,35 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
 
                     // Wallet Dropdown Selector
                     Text(
-                      isDeposit ? 'Dompet Sumber (Potong Saldo)' : 'Dompet Tujuan (Masuk Saldo)',
-                      style: TextStyle(color: subColor, fontSize: 11, fontWeight: FontWeight.bold),
+                      isDeposit
+                          ? 'Dompet Sumber (Potong Saldo)'
+                          : 'Dompet Tujuan (Masuk Saldo)',
+                      style: TextStyle(
+                        color: subColor,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
-                      value: selectedWalletId,
-                      dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                      initialValue: selectedWalletId,
+                      dropdownColor: isDark
+                          ? const Color(0xFF1E293B)
+                          : Colors.white,
                       style: TextStyle(color: textColor, fontSize: 13),
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.015),
+                        fillColor: isDark
+                            ? Colors.white.withValues(alpha: 0.03)
+                            : Colors.black.withValues(alpha: 0.015),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide.none,
                         ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                       ),
                       items: provider.wallets.map((w) {
                         return DropdownMenuItem<String>(
@@ -170,7 +193,13 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                             children: [
                               Icon(w.icon, color: w.color, size: 16),
                               const SizedBox(width: 8),
-                              Text(w.name, style: TextStyle(color: textColor, fontSize: 13)),
+                              Text(
+                                w.name,
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontSize: 13,
+                                ),
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 '(${AppLocale.formatCurrency(w.balance, '$currency ')})',
@@ -191,17 +220,24 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                     // Amount Input
                     TextField(
                       controller: amountController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       decoration: InputDecoration(
                         labelText: 'Jumlah Uang',
                         labelStyle: TextStyle(color: subColor, fontSize: 13),
                         filled: true,
-                        fillColor: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.015),
+                        fillColor: isDark
+                            ? Colors.white.withValues(alpha: 0.03)
+                            : Colors.black.withValues(alpha: 0.015),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide.none,
                         ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
                       ),
                       style: TextStyle(color: textColor, fontSize: 14),
                     ),
@@ -213,33 +249,46 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                       height: 48,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: isDeposit ? const Color(0xFF00D179) : Colors.redAccent,
+                          backgroundColor: isDeposit
+                              ? const Color(0xFF00D179)
+                              : Colors.redAccent,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                         onPressed: () {
-                          final amount = double.tryParse(amountController.text) ?? 0.0;
+                          final amount =
+                              double.tryParse(amountController.text) ?? 0.0;
                           if (amount <= 0) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Masukkan jumlah uang yang valid!')),
+                              const SnackBar(
+                                content: Text(
+                                  'Masukkan jumlah uang yang valid!',
+                                ),
+                              ),
                             );
                             return;
                           }
                           if (selectedWalletId == null) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Pilih dompet terlebih dahulu!')),
+                              const SnackBar(
+                                content: Text('Pilih dompet terlebih dahulu!'),
+                              ),
                             );
                             return;
                           }
 
                           if (isDeposit) {
                             // Check wallet balance
-                            final wallet = provider.wallets.firstWhere((w) => w.id == selectedWalletId);
+                            final wallet = provider.wallets.firstWhere(
+                              (w) => w.id == selectedWalletId,
+                            );
                             if (wallet.balance < amount) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Peringatan: Saldo dompet tidak mencukupi, tetapi transaksi tetap dicatat.'),
+                                  content: Text(
+                                    'Peringatan: Saldo dompet tidak mencukupi, tetapi transaksi tetap dicatat.',
+                                  ),
                                   backgroundColor: Colors.amber,
                                 ),
                               );
@@ -253,7 +302,9 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                             Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Berhasil menyetor ${AppLocale.formatCurrency(amount, '$currency ')}!'),
+                                content: Text(
+                                  'Berhasil menyetor ${AppLocale.formatCurrency(amount, '$currency ')}!',
+                                ),
                                 backgroundColor: const Color(0xFF00D179),
                               ),
                             );
@@ -262,7 +313,9 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                             if (amount > target.savedAmount) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('Jumlah penarikan melebihi dana terkumpul (${AppLocale.formatCurrency(target.savedAmount, '$currency ')})!'),
+                                  content: Text(
+                                    'Jumlah penarikan melebihi dana terkumpul (${AppLocale.formatCurrency(target.savedAmount, '$currency ')})!',
+                                  ),
                                   backgroundColor: Colors.redAccent,
                                 ),
                               );
@@ -277,7 +330,9 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                             Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Berhasil menarik ${AppLocale.formatCurrency(amount, '$currency ')}!'),
+                                content: Text(
+                                  'Berhasil menarik ${AppLocale.formatCurrency(amount, '$currency ')}!',
+                                ),
                                 backgroundColor: Colors.teal,
                               ),
                             );
@@ -285,7 +340,11 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                         },
                         child: Text(
                           isDeposit ? 'Konfirmasi Setor' : 'Konfirmasi Tarik',
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
                     ),
@@ -300,7 +359,11 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
     );
   }
 
-  void _showDeleteConfirm(BuildContext context, AppProvider provider, SavingsTarget target) {
+  void _showDeleteConfirm(
+    BuildContext context,
+    AppProvider provider,
+    SavingsTarget target,
+  ) {
     showDialog(
       context: context,
       builder: (context) {
@@ -315,7 +378,11 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
           ),
           title: Text(
             'Hapus Celengan?',
-            style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 16),
+            style: TextStyle(
+              color: textColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
           content: Text(
             'Apakah Anda yakin ingin menghapus celengan "${target.title}"? Riwayat setoran tidak akan dihapus, tetapi catatan target tabungan ini akan hilang.',
@@ -333,7 +400,13 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                 Navigator.pop(context); // Pop dialog
                 Navigator.pop(context); // Pop detail screen
               },
-              child: const Text('Hapus', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+              child: const Text(
+                'Hapus',
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         );
@@ -349,19 +422,28 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
     final currency = provider.currencySymbol;
 
     // Find the target or return a fallback if not found (e.g. during deletion transition)
-    final targetList = provider.savingsTargets.where((t) => t.id == widget.targetId).toList();
+    final targetList = provider.savingsTargets
+        .where((t) => t.id == widget.targetId)
+        .toList();
     if (targetList.isEmpty) {
       return Scaffold(
         body: Center(
-          child: Text('Target tidak ditemukan', style: TextStyle(color: isDark ? Colors.white : Colors.black)),
+          child: Text(
+            'Target tidak ditemukan',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          ),
         ),
       );
     }
     final target = targetList.first;
 
     final mainTextColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final subTextColor = isDark ? Colors.white.withValues(alpha: 0.45) : const Color(0xFF64748B);
-    final borderColor = isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.05);
+    final subTextColor = isDark
+        ? Colors.white.withValues(alpha: 0.45)
+        : const Color(0xFF64748B);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.04)
+        : Colors.black.withValues(alpha: 0.05);
     final cardBgColor = isDark ? theme.cardColor : Colors.white;
 
     final saved = target.savedAmount;
@@ -372,7 +454,8 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
     // Filter transactions specifically belonging to this saving target
     // We map categoryId == 'sys_saving_target' and subCategory == target.title
     final targetTx = provider.transactions.where((tx) {
-      return tx.categoryId == 'sys_saving_target' && tx.subCategory == target.title;
+      return tx.categoryId == 'sys_saving_target' &&
+          tx.subCategory == target.title;
     }).toList();
 
     return Scaffold(
@@ -390,13 +473,21 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
         backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: mainTextColor, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: mainTextColor,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
             onPressed: () => _showDeleteConfirm(context, provider, target),
-            icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 22),
+            icon: const Icon(
+              Icons.delete_outline_rounded,
+              color: Colors.redAccent,
+              size: 22,
+            ),
           ),
           const SizedBox(width: 8),
         ],
@@ -459,10 +550,16 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                                         ),
                                         if (isFinished)
                                           Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 3,
+                                            ),
                                             decoration: BoxDecoration(
-                                              color: const Color(0xFF00D179).withValues(alpha: 0.12),
-                                              borderRadius: BorderRadius.circular(4),
+                                              color: const Color(
+                                                0xFF00D179,
+                                              ).withValues(alpha: 0.12),
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
                                             ),
                                             child: const Text(
                                               'Tercapai',
@@ -480,7 +577,10 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                                       target.targetDate != null
                                           ? 'Batas Tanggal: ${DateFormat('dd MMMM yyyy').format(target.targetDate!)}'
                                           : 'Tanpa Batas Tanggal',
-                                      style: TextStyle(color: subTextColor, fontSize: 11),
+                                      style: TextStyle(
+                                        color: subTextColor,
+                                        fontSize: 11,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -490,7 +590,11 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                           const SizedBox(height: 24),
                           Text(
                             'Dana Terkumpul',
-                            style: TextStyle(color: subTextColor, fontSize: 12, fontWeight: FontWeight.w500),
+                            style: TextStyle(
+                              color: subTextColor,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Row(
@@ -510,7 +614,9 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                               Text(
                                 '${(progress * 100).toStringAsFixed(0)}%',
                                 style: TextStyle(
-                                  color: isFinished ? const Color(0xFF00D179) : target.color,
+                                  color: isFinished
+                                      ? const Color(0xFF00D179)
+                                      : target.color,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w800,
                                   fontFamily: 'Outfit',
@@ -523,8 +629,14 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                             borderRadius: BorderRadius.circular(4),
                             child: LinearProgressIndicator(
                               value: progress,
-                              backgroundColor: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.04),
-                              valueColor: AlwaysStoppedAnimation<Color>(isFinished ? const Color(0xFF00D179) : target.color),
+                              backgroundColor: isDark
+                                  ? Colors.white.withValues(alpha: 0.04)
+                                  : Colors.black.withValues(alpha: 0.04),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                isFinished
+                                    ? const Color(0xFF00D179)
+                                    : target.color,
+                              ),
                               minHeight: 6,
                             ),
                           ),
@@ -549,13 +661,24 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF00D179),
                                 elevation: 0,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
-                              onPressed: () => _showDepositWithdrawSheet(context, target),
-                              icon: const Icon(Icons.add_rounded, color: Colors.white, size: 18),
+                              onPressed: () =>
+                                  _showDepositWithdrawSheet(context, target),
+                              icon: const Icon(
+                                Icons.add_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              ),
                               label: const Text(
                                 'Setor Uang',
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
                               ),
                             ),
                           ),
@@ -566,22 +689,39 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                             height: 44,
                             child: OutlinedButton.icon(
                               style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Colors.redAccent, width: 1.5),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                side: const BorderSide(
+                                  color: Colors.redAccent,
+                                  width: 1.5,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
                               onPressed: () {
                                 if (saved <= 0) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Celengan Anda masih kosong!')),
+                                    const SnackBar(
+                                      content: Text(
+                                        'Celengan Anda masih kosong!',
+                                      ),
+                                    ),
                                   );
                                   return;
                                 }
                                 _showDepositWithdrawSheet(context, target);
                               },
-                              icon: const Icon(Icons.remove_rounded, color: Colors.redAccent, size: 18),
+                              icon: const Icon(
+                                Icons.remove_rounded,
+                                color: Colors.redAccent,
+                                size: 18,
+                              ),
                               label: const Text(
                                 'Tarik Uang',
-                                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 13),
+                                style: TextStyle(
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
                               ),
                             ),
                           ),
@@ -606,14 +746,23 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                     targetTx.isEmpty
                         ? Center(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 40.0),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 40.0,
+                              ),
                               child: Column(
                                 children: [
-                                  Icon(Icons.history_rounded, size: 40, color: subTextColor.withValues(alpha: 0.15)),
+                                  Icon(
+                                    Icons.history_rounded,
+                                    size: 40,
+                                    color: subTextColor.withValues(alpha: 0.15),
+                                  ),
                                   const SizedBox(height: 8),
                                   Text(
                                     'Belum ada transaksi celengan',
-                                    style: TextStyle(color: subTextColor, fontSize: 12),
+                                    style: TextStyle(
+                                      color: subTextColor,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -623,7 +772,8 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: targetTx.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 8),
+                            separatorBuilder: (_, _) =>
+                                const SizedBox(height: 8),
                             itemBuilder: (context, idx) {
                               final tx = targetTx[idx];
                               final wallet = provider.wallets.firstWhere(
@@ -650,20 +800,28 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: (tx.isExpense ? const Color(0xFF00D179) : Colors.redAccent)
-                                            .withValues(alpha: 0.12),
+                                        color:
+                                            (tx.isExpense
+                                                    ? const Color(0xFF00D179)
+                                                    : Colors.redAccent)
+                                                .withValues(alpha: 0.12),
                                         shape: BoxShape.circle,
                                       ),
                                       child: Icon(
-                                        tx.isExpense ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
-                                        color: tx.isExpense ? const Color(0xFF00D179) : Colors.redAccent,
+                                        tx.isExpense
+                                            ? Icons.arrow_downward_rounded
+                                            : Icons.arrow_upward_rounded,
+                                        color: tx.isExpense
+                                            ? const Color(0xFF00D179)
+                                            : Colors.redAccent,
                                         size: 16,
                                       ),
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             tx.title,
@@ -687,7 +845,9 @@ class _SavingsTargetDetailScreenState extends State<SavingsTargetDetailScreen> {
                                     Text(
                                       '${tx.isExpense ? "-" : "+"} ${AppLocale.formatCurrency(tx.amount, '$currency ')}',
                                       style: TextStyle(
-                                        color: tx.isExpense ? const Color(0xFF00D179) : Colors.redAccent,
+                                        color: tx.isExpense
+                                            ? const Color(0xFF00D179)
+                                            : Colors.redAccent,
                                         fontWeight: FontWeight.w800,
                                         fontSize: 12,
                                         fontFamily: 'Outfit',

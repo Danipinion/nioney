@@ -261,6 +261,8 @@ class AppProvider with ChangeNotifier {
       _debts = [];
     }
 
+    await checkAndProcessRecurringTransactions();
+
     notifyListeners();
   }
 
@@ -470,6 +472,103 @@ class AppProvider with ChangeNotifier {
   }
 
   // Recurring Transaction Operations
+  bool _isRecurringOccurringOnDate(RecurringTransaction item, DateTime date) {
+    final dateOnly = DateTime(date.year, date.month, date.day);
+    final startOnly = DateTime(item.startDate.year, item.startDate.month, item.startDate.day);
+    if (dateOnly.isBefore(startOnly)) return false;
+
+    if (item.endDate != null) {
+      final endOnly = DateTime(item.endDate!.year, item.endDate!.month, item.endDate!.day);
+      if (dateOnly.isAfter(endOnly)) return false;
+    }
+
+    if (item.period == 'DAILY') return true;
+    if (item.period == 'WEEKLY') return dateOnly.weekday == startOnly.weekday;
+    if (item.period == 'MONTHLY') return dateOnly.day == startOnly.day;
+    if (item.period == 'YEARLY') return dateOnly.month == startOnly.month && dateOnly.day == startOnly.day;
+
+    return false;
+  }
+
+  Future<void> checkAndProcessRecurringTransactions() async {
+    bool hasChanges = false;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    for (int i = 0; i < _recurringTransactions.length; i++) {
+      final item = _recurringTransactions[i];
+      
+      // Determine the start date for check
+      DateTime checkDate;
+      if (item.lastProcessedDate != null) {
+        // Start from day after last processed
+        checkDate = DateTime(item.lastProcessedDate!.year, item.lastProcessedDate!.month, item.lastProcessedDate!.day).add(const Duration(days: 1));
+      } else {
+        // Start from the start date
+        checkDate = DateTime(item.startDate.year, item.startDate.month, item.startDate.day);
+      }
+
+      DateTime? latestProcessed;
+      List<Transaction> newTxs = [];
+
+      // Loop day by day up to today
+      while (!checkDate.isAfter(today)) {
+        // If we have an end date, and we've passed it, stop processing this item
+        if (item.endDate != null) {
+          final endOnly = DateTime(item.endDate!.year, item.endDate!.month, item.endDate!.day);
+          if (checkDate.isAfter(endOnly)) {
+            break;
+          }
+        }
+
+        if (_isRecurringOccurringOnDate(item, checkDate)) {
+          // Create transaction!
+          final txId = 'tx_rec_${item.id}_${checkDate.year}_${checkDate.month}_${checkDate.day}';
+          
+          // Double check to prevent duplicates
+          final alreadyExists = _transactions.any((tx) => tx.id == txId);
+          if (!alreadyExists) {
+            final tx = Transaction(
+              id: txId,
+              title: item.title,
+              amount: item.amount,
+              isExpense: item.isExpense,
+              categoryId: item.categoryId,
+              subCategory: item.subCategory,
+              walletId: item.walletId,
+              date: checkDate,
+              note: 'Generated from recurring plan',
+            );
+            newTxs.add(tx);
+          }
+        }
+
+        latestProcessed = checkDate;
+        checkDate = checkDate.add(const Duration(days: 1));
+      }
+
+      if (latestProcessed != null) {
+        _recurringTransactions[i] = item.copyWith(lastProcessedDate: latestProcessed);
+        hasChanges = true;
+      }
+
+      if (newTxs.isNotEmpty) {
+        for (var tx in newTxs) {
+          _transactions.insert(0, tx);
+          // Update wallet balance immediately
+          _updateWalletBalance(tx.walletId, tx.isExpense ? -tx.amount : tx.amount);
+        }
+      }
+    }
+
+    if (hasChanges) {
+      await _saveTransactions();
+      await _saveWallets();
+      await _saveRecurringTransactions();
+      notifyListeners();
+    }
+  }
+
   Future<void> addRecurringTransaction({
     required String title,
     required double amount,
@@ -479,6 +578,7 @@ class AppProvider with ChangeNotifier {
     String subCategory = '',
     required String walletId,
     required DateTime startDate,
+    DateTime? endDate,
   }) async {
     final r = RecurringTransaction(
       id: 'recurring_${_uuid.v4()}',
@@ -490,10 +590,13 @@ class AppProvider with ChangeNotifier {
       subCategory: subCategory,
       walletId: walletId,
       startDate: startDate,
+      endDate: endDate,
     );
     _recurringTransactions.add(r);
     await _saveRecurringTransactions();
-    notifyListeners();
+    
+    // Process transactions for this recurring entry immediately
+    await checkAndProcessRecurringTransactions();
   }
 
   Future<void> updateRecurringTransaction(RecurringTransaction updated) async {
@@ -501,7 +604,9 @@ class AppProvider with ChangeNotifier {
     if (index != -1) {
       _recurringTransactions[index] = updated;
       await _saveRecurringTransactions();
-      notifyListeners();
+      
+      // Re-run processor to check for any newly due occurrences
+      await checkAndProcessRecurringTransactions();
     }
   }
 

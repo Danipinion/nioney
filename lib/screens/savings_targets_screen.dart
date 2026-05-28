@@ -63,7 +63,9 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   color: sheetBg,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)), // Less rounded as requested
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ), // Less rounded as requested
                 ),
                 padding: const EdgeInsets.all(20.0),
                 child: SingleChildScrollView(
@@ -92,7 +94,7 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // Name Input
                       TextField(
                         controller: titleController,
@@ -100,12 +102,19 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                           labelText: 'Nama Keinginan / Target',
                           labelStyle: TextStyle(color: subColor, fontSize: 13),
                           filled: true,
-                          fillColor: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.015),
+                          fillColor: isDark
+                              ? Colors.white.withValues(alpha: 0.03)
+                              : Colors.black.withValues(alpha: 0.015),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10), // Clean, less rounded
+                            borderRadius: BorderRadius.circular(
+                              10,
+                            ), // Clean, less rounded
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
                         ),
                         style: TextStyle(color: textColor, fontSize: 14),
                       ),
@@ -114,17 +123,24 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                       // Target Amount Input
                       TextField(
                         controller: targetController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                         decoration: InputDecoration(
                           labelText: 'Target Jumlah Tabungan',
                           labelStyle: TextStyle(color: subColor, fontSize: 13),
                           filled: true,
-                          fillColor: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.015),
+                          fillColor: isDark
+                              ? Colors.white.withValues(alpha: 0.03)
+                              : Colors.black.withValues(alpha: 0.015),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
                         ),
                         style: TextStyle(color: textColor, fontSize: 14),
                       ),
@@ -159,9 +175,14 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                           }
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
                           decoration: BoxDecoration(
-                            color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.015),
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.03)
+                                : Colors.black.withValues(alpha: 0.015),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Row(
@@ -169,14 +190,22 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.calendar_month_rounded, size: 18, color: Theme.of(context).primaryColor),
+                                  Icon(
+                                    Icons.calendar_month_rounded,
+                                    size: 18,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
                                   const SizedBox(width: 12),
                                   Text(
                                     selectedDate != null
-                                        ? DateFormat('dd MMMM yyyy').format(selectedDate!)
+                                        ? DateFormat(
+                                            'dd MMMM yyyy',
+                                          ).format(selectedDate!)
                                         : 'Tanggal Berakhir (Opsional)',
                                     style: TextStyle(
-                                      color: selectedDate != null ? textColor : subColor,
+                                      color: selectedDate != null
+                                          ? textColor
+                                          : subColor,
                                       fontSize: 13,
                                     ),
                                   ),
@@ -189,10 +218,18 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                                       selectedDate = null;
                                     });
                                   },
-                                  child: Icon(Icons.clear_rounded, size: 18, color: subColor),
+                                  child: Icon(
+                                    Icons.clear_rounded,
+                                    size: 18,
+                                    color: subColor,
+                                  ),
                                 )
                               else
-                                Icon(Icons.chevron_right_rounded, size: 18, color: subColor),
+                                Icon(
+                                  Icons.chevron_right_rounded,
+                                  size: 18,
+                                  color: subColor,
+                                ),
                             ],
                           ),
                         ),
@@ -202,7 +239,11 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                       // Color selector
                       Text(
                         'Pilih Warna',
-                        style: TextStyle(color: subColor, fontSize: 12, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: subColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       SizedBox(
@@ -210,12 +251,13 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: _availableColors.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 10),
+                          separatorBuilder: (_, _) => const SizedBox(width: 10),
                           itemBuilder: (context, idx) {
                             final col = _availableColors[idx];
                             final isSel = selectedColor == col;
                             return GestureDetector(
-                              onTap: () => setSheetState(() => selectedColor = col),
+                              onTap: () =>
+                                  setSheetState(() => selectedColor = col),
                               child: Container(
                                 width: 36,
                                 height: 36,
@@ -227,7 +269,11 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                                       : null,
                                 ),
                                 child: isSel
-                                    ? const Icon(Icons.check, color: Colors.white, size: 16)
+                                    ? const Icon(
+                                        Icons.check,
+                                        color: Colors.white,
+                                        size: 16,
+                                      )
                                     : null,
                               ),
                             );
@@ -239,7 +285,11 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                       // Icon selector
                       Text(
                         'Pilih Ikon',
-                        style: TextStyle(color: subColor, fontSize: 12, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: subColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       SizedBox(
@@ -247,23 +297,35 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: _availableIcons.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 10),
+                          separatorBuilder: (_, _) => const SizedBox(width: 10),
                           itemBuilder: (context, idx) {
                             final ic = _availableIcons[idx];
                             final isSel = selectedIcon == ic;
                             return GestureDetector(
-                              onTap: () => setSheetState(() => selectedIcon = ic),
+                              onTap: () =>
+                                  setSheetState(() => selectedIcon = ic),
                               child: Container(
                                 width: 40,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03),
+                                  color: isDark
+                                      ? Colors.white.withValues(alpha: 0.05)
+                                      : Colors.black.withValues(alpha: 0.03),
                                   borderRadius: BorderRadius.circular(8),
                                   border: isSel
-                                      ? Border.all(color: Theme.of(context).primaryColor, width: 2)
+                                      ? Border.all(
+                                          color: Theme.of(context).primaryColor,
+                                          width: 2,
+                                        )
                                       : null,
                                 ),
-                                child: Icon(ic, color: isSel ? Theme.of(context).primaryColor : subColor, size: 20),
+                                child: Icon(
+                                  ic,
+                                  color: isSel
+                                      ? Theme.of(context).primaryColor
+                                      : subColor,
+                                  size: 20,
+                                ),
                               ),
                             );
                           },
@@ -284,9 +346,13 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                           ),
                           onPressed: () {
                             final title = titleController.text.trim();
-                            final targetVal = double.tryParse(targetController.text) ?? 0.0;
+                            final targetVal =
+                                double.tryParse(targetController.text) ?? 0.0;
                             if (title.isNotEmpty && targetVal > 0) {
-                              Provider.of<AppProvider>(context, listen: false).addSavingsTarget(
+                              Provider.of<AppProvider>(
+                                context,
+                                listen: false,
+                              ).addSavingsTarget(
                                 title: title,
                                 targetAmount: targetVal,
                                 targetDate: selectedDate,
@@ -297,7 +363,9 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Nama target & target jumlah tabungan harus diisi dengan benar!'),
+                                  content: Text(
+                                    'Nama target & target jumlah tabungan harus diisi dengan benar!',
+                                  ),
                                   backgroundColor: Colors.redAccent,
                                 ),
                               );
@@ -305,7 +373,11 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                           },
                           child: const Text(
                             'Buat Target',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                       ),
@@ -321,8 +393,6 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<AppProvider>(context);
@@ -331,8 +401,12 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
     final currency = provider.currencySymbol;
 
     final mainTextColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final subTextColor = isDark ? Colors.white.withValues(alpha: 0.45) : const Color(0xFF64748B);
-    final borderColor = isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.05);
+    final subTextColor = isDark
+        ? Colors.white.withValues(alpha: 0.45)
+        : const Color(0xFF64748B);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.04)
+        : Colors.black.withValues(alpha: 0.05);
     final cardBgColor = isDark ? theme.cardColor : Colors.white;
 
     double totalTarget = 0.0;
@@ -342,7 +416,9 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
       totalSaved += t.savedAmount;
     }
 
-    final overallProgress = totalTarget > 0 ? (totalSaved / totalTarget).clamp(0.0, 1.0) : 0.0;
+    final overallProgress = totalTarget > 0
+        ? (totalSaved / totalTarget).clamp(0.0, 1.0)
+        : 0.0;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -359,7 +435,11 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
         backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: mainTextColor, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: mainTextColor,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -378,7 +458,9 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: cardBgColor,
-                  borderRadius: BorderRadius.circular(14), // Sharp / less rounded as requested
+                  borderRadius: BorderRadius.circular(
+                    14,
+                  ), // Sharp / less rounded as requested
                   border: Border.all(color: borderColor),
                 ),
                 child: Column(
@@ -406,9 +488,14 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF00D179).withValues(alpha: 0.1),
+                            color: const Color(
+                              0xFF00D179,
+                            ).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -427,18 +514,19 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                       borderRadius: BorderRadius.circular(4),
                       child: LinearProgressIndicator(
                         value: overallProgress,
-                        backgroundColor: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
-                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF00D179)),
+                        backgroundColor: isDark
+                            ? Colors.white10
+                            : Colors.black.withValues(alpha: 0.05),
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          Color(0xFF00D179),
+                        ),
                         minHeight: 6,
                       ),
                     ),
                     const SizedBox(height: 10),
                     Text(
                       'Target Akumulasi: ${AppLocale.formatCurrency(totalTarget, '$currency ')}',
-                      style: TextStyle(
-                        color: subTextColor,
-                        fontSize: 11,
-                      ),
+                      style: TextStyle(color: subTextColor, fontSize: 11),
                     ),
                   ],
                 ),
@@ -462,9 +550,19 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 40.0),
                         child: Column(
                           children: [
-                            Icon(Icons.savings_rounded, size: 48, color: subTextColor.withValues(alpha: 0.2)),
+                            Icon(
+                              Icons.savings_rounded,
+                              size: 48,
+                              color: subTextColor.withValues(alpha: 0.2),
+                            ),
                             const SizedBox(height: 12),
-                            Text('Belum ada target tabungan', style: TextStyle(color: mainTextColor, fontSize: 13)),
+                            Text(
+                              'Belum ada target tabungan',
+                              style: TextStyle(
+                                color: mainTextColor,
+                                fontSize: 13,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -474,7 +572,9 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                         final color = t.color;
                         final saved = t.savedAmount;
                         final target = t.targetAmount;
-                        final progress = target > 0 ? (saved / target).clamp(0.0, 1.0) : 0.0;
+                        final progress = target > 0
+                            ? (saved / target).clamp(0.0, 1.0)
+                            : 0.0;
                         final isFinished = t.isAchieved;
 
                         return Container(
@@ -493,7 +593,10 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => SavingsTargetDetailScreen(targetId: t.id),
+                                    builder: (context) =>
+                                        SavingsTargetDetailScreen(
+                                          targetId: t.id,
+                                        ),
                                   ),
                                 );
                               },
@@ -507,8 +610,12 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                                         Container(
                                           padding: const EdgeInsets.all(8),
                                           decoration: BoxDecoration(
-                                            color: color.withValues(alpha: 0.12),
-                                            borderRadius: BorderRadius.circular(8),
+                                            color: color.withValues(
+                                              alpha: 0.12,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           child: Icon(
                                             t.icon,
@@ -519,7 +626,8 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                                         const SizedBox(width: 12),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Row(
                                                 children: [
@@ -528,24 +636,48 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                                                       t.title,
                                                       style: TextStyle(
                                                         color: mainTextColor,
-                                                        fontWeight: FontWeight.w800,
+                                                        fontWeight:
+                                                            FontWeight.w800,
                                                         fontSize: 13,
                                                       ),
                                                       maxLines: 1,
-                                                      overflow: TextOverflow.ellipsis,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     ),
                                                   ),
                                                   if (isFinished)
                                                     Container(
-                                                      margin: const EdgeInsets.only(left: 6),
-                                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                            left: 6,
+                                                          ),
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 6,
+                                                            vertical: 2,
+                                                          ),
                                                       decoration: BoxDecoration(
-                                                        color: const Color(0xFF00D179).withValues(alpha: 0.12),
-                                                        borderRadius: BorderRadius.circular(4),
+                                                        color:
+                                                            const Color(
+                                                              0xFF00D179,
+                                                            ).withValues(
+                                                              alpha: 0.12,
+                                                            ),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              4,
+                                                            ),
                                                       ),
                                                       child: const Text(
                                                         'Tercapai',
-                                                        style: TextStyle(color: Color(0xFF00D179), fontSize: 9, fontWeight: FontWeight.bold),
+                                                        style: TextStyle(
+                                                          color: Color(
+                                                            0xFF00D179,
+                                                          ),
+                                                          fontSize: 9,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
                                                       ),
                                                     ),
                                                 ],
@@ -565,14 +697,17 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                                         ),
                                         Icon(
                                           Icons.arrow_forward_ios_rounded,
-                                          color: subTextColor.withValues(alpha: 0.3),
+                                          color: subTextColor.withValues(
+                                            alpha: 0.3,
+                                          ),
                                           size: 12,
                                         ),
                                       ],
                                     ),
                                     const SizedBox(height: 12),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           '${AppLocale.formatCurrency(saved, '$currency ')} / ${AppLocale.formatCurrency(target, '$currency ')}',
@@ -586,7 +721,9 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                                         Text(
                                           '${(progress * 100).toStringAsFixed(0)}%',
                                           style: TextStyle(
-                                            color: isFinished ? const Color(0xFF00D179) : color,
+                                            color: isFinished
+                                                ? const Color(0xFF00D179)
+                                                : color,
                                             fontSize: 11,
                                             fontWeight: FontWeight.w800,
                                             fontFamily: 'Outfit',
@@ -599,8 +736,19 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
                                       borderRadius: BorderRadius.circular(4),
                                       child: LinearProgressIndicator(
                                         value: progress,
-                                        backgroundColor: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.04),
-                                        valueColor: AlwaysStoppedAnimation<Color>(isFinished ? const Color(0xFF00D179) : color),
+                                        backgroundColor: isDark
+                                            ? Colors.white.withValues(
+                                                alpha: 0.04,
+                                              )
+                                            : Colors.black.withValues(
+                                                alpha: 0.04,
+                                              ),
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              isFinished
+                                                  ? const Color(0xFF00D179)
+                                                  : color,
+                                            ),
                                         minHeight: 5,
                                       ),
                                     ),
@@ -620,9 +768,7 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddSheet,
         backgroundColor: Theme.of(context).primaryColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.add_rounded, color: Colors.white, size: 24),
       ),
     );

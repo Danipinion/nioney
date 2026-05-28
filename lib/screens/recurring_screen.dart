@@ -20,6 +20,11 @@ class _RecurringScreenState extends State<RecurringScreen> {
     final startOnly = DateTime(item.startDate.year, item.startDate.month, item.startDate.day);
     if (dateOnly.isBefore(startOnly)) return false;
 
+    if (item.endDate != null) {
+      final endOnly = DateTime(item.endDate!.year, item.endDate!.month, item.endDate!.day);
+      if (dateOnly.isAfter(endOnly)) return false;
+    }
+
     if (item.period == 'DAILY') return true;
     if (item.period == 'WEEKLY') return dateOnly.weekday == startOnly.weekday;
     if (item.period == 'MONTHLY') return dateOnly.day == startOnly.day;
@@ -341,7 +346,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
     String selectedWallet = 'Cash';
     // Wallet will be initialized inside builder based on provider
     DateTime startDate = editItem != null ? editItem.startDate : DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-    DateTime? endDate;
+    DateTime? endDate = editItem?.endDate;
 
     Navigator.push(
       context,
@@ -413,6 +418,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                                 subCategory: selectedSubCategory,
                                 walletId: wId,
                                 startDate: startDate,
+                                endDate: endDate,
                               )
                             );
                           } else {
@@ -425,6 +431,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                               subCategory: selectedSubCategory,
                               walletId: wId,
                               startDate: startDate,
+                              endDate: endDate,
                             );
                           }
                           Navigator.pop(context);
