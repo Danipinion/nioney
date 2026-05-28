@@ -46,8 +46,8 @@ class _RecurringScreenState extends State<RecurringScreen> {
     return subList.map((name) => {'name': name, 'icon': Icons.circle_outlined}).toList();
   }
 
-  DateTime _selectedDate = DateTime(2026, 5, 19);
-  DateTime _currentMonth = DateTime(2026, 5, 1);
+  DateTime _selectedDate = DateTime.now();
+  DateTime _currentMonth = DateTime(DateTime.now().year, DateTime.now().month, 1);
 
   void _showCupertinoDatePicker({
     required BuildContext context,
@@ -1018,7 +1018,10 @@ class _RecurringScreenState extends State<RecurringScreen> {
 
               // 2. Selected Date Header
               Text(
-                'Transaksi pada ${_selectedDate.day} May ${_selectedDate.year}',
+                'Transaksi pada ${_selectedDate.day} ${[
+                  'January', 'February', 'March', 'April', 'May', 'June',
+                  'July', 'August', 'September', 'October', 'November', 'December'
+                ][_selectedDate.month - 1]} ${_selectedDate.year}',
                 style: TextStyle(
                   color: mainTextColor,
                   fontSize: 14,
