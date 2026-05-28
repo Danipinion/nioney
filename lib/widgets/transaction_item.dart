@@ -137,14 +137,18 @@ class TransactionItem extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Text(
-                        transaction.subCategory.isNotEmpty
-                            ? '${category.name} › ${transaction.subCategory}'
-                            : category.name,
-                        style: TextStyle(
-                          color: subTextColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
+                      Flexible(
+                        child: Text(
+                          transaction.subCategory.isNotEmpty
+                              ? '${category.name} › ${transaction.subCategory}'
+                              : category.name,
+                          style: TextStyle(
+                            color: subTextColor,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       Text(
@@ -154,21 +158,25 @@ class TransactionItem extends StatelessWidget {
                           fontSize: 10,
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: wallet.color.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          wallet.name,
-                          style: TextStyle(
-                            color: wallet.color.withValues(alpha: 0.8),
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: wallet.color.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            wallet.name,
+                            style: TextStyle(
+                              color: wallet.color.withValues(alpha: 0.8),
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ),

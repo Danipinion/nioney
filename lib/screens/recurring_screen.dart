@@ -1109,16 +1109,24 @@ class _RecurringScreenState extends State<RecurringScreen> {
                                           const SizedBox(width: 6),
                                           Icon(Icons.wallet_rounded, size: 10, color: subTextColor),
                                           const SizedBox(width: 2),
-                                          Text(
-                                            wallet.name,
-                                            style: TextStyle(color: subTextColor, fontSize: 10, fontWeight: FontWeight.w500),
+                                          Flexible(
+                                            child: Text(
+                                              wallet.name,
+                                              style: TextStyle(color: subTextColor, fontSize: 10, fontWeight: FontWeight.w500),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
                                           const SizedBox(width: 6),
                                           Icon(cat.icon, size: 10, color: categoryCol),
                                           const SizedBox(width: 2),
-                                          Text(
-                                            cat.name + (item.subCategory.isNotEmpty ? ' › ${item.subCategory}' : ''),
-                                            style: TextStyle(color: categoryCol, fontSize: 10, fontWeight: FontWeight.bold),
+                                          Flexible(
+                                            child: Text(
+                                              cat.name + (item.subCategory.isNotEmpty ? ' › ${item.subCategory}' : ''),
+                                              style: TextStyle(color: categoryCol, fontSize: 10, fontWeight: FontWeight.bold),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
                                         ],
                                       ),
