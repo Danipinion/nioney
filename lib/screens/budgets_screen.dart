@@ -550,6 +550,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () => _showAddBudgetSheet(context),
         backgroundColor: const Color(0xFF1E293B), // Sleek flat dark navy FAB
         child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),

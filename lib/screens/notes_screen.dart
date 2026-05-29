@@ -370,6 +370,7 @@ class _NotesScreenState extends State<NotesScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: _showAddSheet,
         backgroundColor: const Color(0xFF1E293B),
         child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),

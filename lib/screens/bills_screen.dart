@@ -810,6 +810,7 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () => _showAddEditBillSheet(),
         backgroundColor: const Color(0xFF1E293B),
         child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),

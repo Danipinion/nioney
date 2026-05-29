@@ -834,6 +834,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       // FAB to Add Category (Only for editable tabs)
       floatingActionButton: _activeTab != 2
           ? FloatingActionButton(
+              heroTag: null,
               backgroundColor: const Color(0xFF23354E),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),

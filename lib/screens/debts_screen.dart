@@ -1034,6 +1034,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: _showAddDebtSheet,
         backgroundColor: const Color(0xFF1E293B),
         child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),

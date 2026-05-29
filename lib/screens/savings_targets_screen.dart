@@ -765,6 +765,7 @@ class _SavingsTargetsScreenState extends State<SavingsTargetsScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: _showAddSheet,
         backgroundColor: Theme.of(context).primaryColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
