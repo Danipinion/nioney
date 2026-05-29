@@ -494,8 +494,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final filteredYearly = yearlyTxs.where((tx) {
       if (!tx.isExpense) return false;
       if (_yearlyFilterCategoryId != null &&
-          tx.categoryId != _yearlyFilterCategoryId)
+          tx.categoryId != _yearlyFilterCategoryId) {
         return false;
+      }
       return true;
     }).toList();
 
@@ -1847,8 +1848,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final filteredWeekly = weeklyTxs.where((tx) {
       if (!tx.isExpense) return false;
       if (_weeklyFilterCategoryId != null &&
-          tx.categoryId != _weeklyFilterCategoryId)
+          tx.categoryId != _weeklyFilterCategoryId) {
         return false;
+      }
       return true;
     }).toList();
 
@@ -2549,8 +2551,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final filteredMonthly = monthlyTxs.where((tx) {
       if (!tx.isExpense) return false;
       if (_monthlyFilterCategoryId != null &&
-          tx.categoryId != _monthlyFilterCategoryId)
+          tx.categoryId != _monthlyFilterCategoryId) {
         return false;
+      }
       return true;
     }).toList();
 

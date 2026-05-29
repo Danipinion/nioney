@@ -5,7 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'providers/app_provider.dart';
 import 'theme/app_theme.dart';
-import 'screens/home_navigation.dart';
+import 'screens/splash_screen.dart';
+import 'screens/pin_lock_screen.dart';
 
 class AppLocale {
   static bool isInitialized = false;
@@ -78,7 +79,28 @@ class NioneyApp extends StatelessWidget {
         ThemeMode.dark,
       ),
       themeMode: provider.themeMode,
-      home: const HomeNavigation(),
+      home: const SplashScreen(),
+      builder: (context, child) {
+        return Consumer<AppProvider>(
+          builder: (context, appProv, _) {
+            return Listener(
+              behavior: HitTestBehavior.translucent,
+              onPointerDown: (_) {
+                appProv.updateActivity();
+              },
+              child: Stack(
+                children: [
+                  child!,
+                  if (appProv.isPinEnabled && appProv.isAppLocked)
+                    const Positioned.fill(
+                      child: PinLockScreen(mode: PinMode.unlock),
+                    ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

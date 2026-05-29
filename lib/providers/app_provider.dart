@@ -11,7 +11,7 @@ import '../models/savings_target.dart';
 import '../models/bill.dart';
 import '../models/debt.dart';
 
-class AppProvider with ChangeNotifier {
+class AppProvider with ChangeNotifier, WidgetsBindingObserver {
   static const String _prefTransactionsKey = 'nioney_transactions';
   static const String _prefWalletsKey = 'nioney_wallets';
   static const String _prefBudgetsKey = 'nioney_budgets';
@@ -41,6 +41,13 @@ class AppProvider with ChangeNotifier {
   String _currentPalette = 'Deep Sapphire';
   String _currencySymbol = 'Rp';
 
+  // PIN settings fields
+  String? _pinCode;
+  bool _isPinEnabled = false;
+  int _sessionTimeoutMinutes = 15;
+  bool _isAppLocked = false;
+  DateTime _lastActiveTime = DateTime.now();
+
   // Getters
   List<Category> get categories => _categories;
   Map<String, List<String>> get subCategories => _subCategories;
@@ -55,12 +62,26 @@ class AppProvider with ChangeNotifier {
   String get currentPalette => _currentPalette;
   String get currencySymbol => _currencySymbol;
 
+  // PIN settings getters
+  String? get pinCode => _pinCode;
+  bool get isPinEnabled => _isPinEnabled;
+  int get sessionTimeoutMinutes => _sessionTimeoutMinutes;
+  bool get isAppLocked => _isAppLocked;
+  DateTime get lastActiveTime => _lastActiveTime;
+
   List<String> getSubCategoriesForCategory(String categoryId) {
     return _subCategories[categoryId] ?? [];
   }
 
   AppProvider() {
     _loadData();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   List<Category> _getDefaultCategoriesList() {
@@ -259,6 +280,15 @@ class AppProvider with ChangeNotifier {
       }
     } else {
       _debts = [];
+    }
+
+    _pinCode = prefs.getString('nioney_pin_code');
+    _isPinEnabled = prefs.getBool('nioney_pin_enabled') ?? false;
+    _sessionTimeoutMinutes = prefs.getInt('nioney_session_timeout') ?? 15;
+    if (_isPinEnabled && _pinCode != null && _pinCode!.isNotEmpty) {
+      _isAppLocked = true;
+    } else {
+      _isAppLocked = false;
     }
 
     await checkAndProcessRecurringTransactions();
@@ -1180,5 +1210,154 @@ class AppProvider with ChangeNotifier {
     _debts.removeWhere((d) => d.id == id);
     await _saveDebts();
     notifyListeners();
+  }
+
+  // PIN Lock & Session Management
+  Future<void> setPin(String newPin) async {
+    _pinCode = newPin;
+    _isPinEnabled = true;
+    _isAppLocked = false;
+    _lastActiveTime = DateTime.now();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('nioney_pin_code', newPin);
+    await prefs.setBool('nioney_pin_enabled', true);
+    notifyListeners();
+  }
+
+  Future<void> disablePin() async {
+    _pinCode = null;
+    _isPinEnabled = false;
+    _isAppLocked = false;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('nioney_pin_code');
+    await prefs.setBool('nioney_pin_enabled', false);
+    notifyListeners();
+  }
+
+  Future<void> setSessionTimeout(int minutes) async {
+    _sessionTimeoutMinutes = minutes;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('nioney_session_timeout', minutes);
+    notifyListeners();
+  }
+
+  void lock() {
+    if (_isPinEnabled && _pinCode != null && _pinCode!.isNotEmpty) {
+      _isAppLocked = true;
+      notifyListeners();
+    }
+  }
+
+  bool unlock(String enteredPin) {
+    if (_pinCode == enteredPin) {
+      _isAppLocked = false;
+      _lastActiveTime = DateTime.now();
+      notifyListeners();
+      return true;
+    }
+    return false;
+  }
+
+  void updateActivity() {
+    if (!_isPinEnabled || _pinCode == null || _pinCode!.isEmpty) return;
+    
+    final now = DateTime.now();
+    if (_sessionTimeoutMinutes != -1 && now.difference(_lastActiveTime).inMinutes >= _sessionTimeoutMinutes) {
+      _isAppLocked = true;
+      notifyListeners();
+    } else {
+      _lastActiveTime = now;
+    }
+  }
+
+  void checkSessionTimeout() {
+    if (!_isPinEnabled || _pinCode == null || _pinCode!.isEmpty) return;
+    if (_sessionTimeoutMinutes == -1) return;
+
+    final difference = DateTime.now().difference(_lastActiveTime).inMinutes;
+    if (difference >= _sessionTimeoutMinutes) {
+      _isAppLocked = true;
+      notifyListeners();
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _lastActiveTime = DateTime.now();
+    } else if (state == AppLifecycleState.resumed) {
+      checkSessionTimeout();
+    }
+  }
+
+  // Backup & Restore
+  Future<String> exportBackupData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> backup = {};
+
+    final List<String> keys = [
+      _prefTransactionsKey,
+      _prefWalletsKey,
+      _prefBudgetsKey,
+      _prefRecurringKey,
+      _prefThemeModeKey,
+      _prefPaletteKey,
+      _prefCurrencyKey,
+      _prefCategoriesKey,
+      _prefSubCategoriesKey,
+      _prefSavingsTargetsKey,
+      _prefBillsKey,
+      _prefDebtsKey,
+      'nioney_pin_code',
+      'nioney_pin_enabled',
+      'nioney_session_timeout',
+    ];
+
+    for (var key in keys) {
+      final val = prefs.get(key);
+      if (val != null) {
+        backup[key] = val;
+      }
+    }
+
+    return base64Encode(utf8.encode(jsonEncode(backup)));
+  }
+
+  Future<bool> restoreBackupData(String base64Data) async {
+    try {
+      final decodedBytes = base64Decode(base64Data.trim());
+      final jsonStr = utf8.decode(decodedBytes);
+      final Map<String, dynamic> backup = jsonDecode(jsonStr);
+
+      if (!backup.containsKey(_prefWalletsKey) || !backup.containsKey(_prefTransactionsKey)) {
+        return false;
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+
+      for (var entry in backup.entries) {
+        final key = entry.key;
+        final value = entry.value;
+
+        if (value is String) {
+          await prefs.setString(key, value);
+        } else if (value is bool) {
+          await prefs.setBool(key, value);
+        } else if (value is int) {
+          await prefs.setInt(key, value);
+        } else if (value is double) {
+          await prefs.setDouble(key, value);
+        } else if (value is List) {
+          await prefs.setStringList(key, List<String>.from(value));
+        }
+      }
+
+      await _loadData();
+      notifyListeners();
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/app_provider.dart';
-import '../models/savings_target.dart';
 import '../main.dart';
 import 'savings_target_detail_screen.dart';
 

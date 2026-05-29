@@ -115,7 +115,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               const SizedBox(height: 16),
 
-              // 1. Header Row (~ Hai, Danipinion! + Lvl 1 + Avatar)
+              // 1. Header Row (~ Hai, Danipinion!)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -127,74 +127,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       fontWeight: FontWeight.w800,
                       fontFamily: 'Outfit',
                     ),
-                  ),
-                  Row(
-                    children: [
-                      // Level Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.05)
-                              : Colors.black.withValues(alpha: 0.03),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.1)
-                                : Colors.black.withValues(alpha: 0.05),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.star_rounded,
-                              color: Color(0xFFFFCA28), // Gold/Amber Star
-                              size: 14,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              'Lvl 1',
-                              style: TextStyle(
-                                color: mainTextColor,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      // Cute Green Avatar
-                      Container(
-                        height: 38,
-                        width: 38,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF00D179), // Premium Green
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(
-                                0xFF00D179,
-                              ).withValues(alpha: 0.25),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                          border: Border.all(color: Colors.white, width: 1.5),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.sentiment_very_satisfied_rounded,
-                            color: Colors.white,
-                            size: 22,
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),
