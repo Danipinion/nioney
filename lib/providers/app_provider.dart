@@ -1333,14 +1333,20 @@ class AppProvider with ChangeNotifier, WidgetsBindingObserver {
       }
     }
 
-    return base64Encode(utf8.encode(jsonEncode(backup)));
+    return const JsonEncoder.withIndent('  ').convert(backup);
   }
 
-  Future<bool> restoreBackupData(String base64Data) async {
+  Future<bool> restoreBackupData(String inputContent) async {
     try {
-      final decodedBytes = base64Decode(base64Data.trim());
-      final jsonStr = utf8.decode(decodedBytes);
-      final Map<String, dynamic> backup = jsonDecode(jsonStr);
+      final trimmed = inputContent.trim();
+      Map<String, dynamic> backup;
+      if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+        backup = jsonDecode(trimmed);
+      } else {
+        final decodedBytes = base64Decode(trimmed);
+        final jsonStr = utf8.decode(decodedBytes);
+        backup = jsonDecode(jsonStr);
+      }
 
       if (!backup.containsKey(_prefWalletsKey) || !backup.containsKey(_prefTransactionsKey)) {
         return false;

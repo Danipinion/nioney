@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/app_provider.dart';
 import 'categories_screen.dart';
 import 'pin_lock_screen.dart';
+import 'dart:io';
+import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:file_picker/file_picker.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -137,7 +140,6 @@ class SettingsScreen extends StatelessWidget {
   }
 
   void _showRestoreDialog(BuildContext context, AppProvider provider) {
-    final textController = TextEditingController();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final mainTextColor = isDark ? Colors.white : const Color(0xFF0F172A);
     final subTextColor = isDark ? Colors.white70 : const Color(0xFF64748B);
@@ -154,33 +156,9 @@ class SettingsScreen extends StatelessWidget {
             'Restore Data Cadangan',
             style: TextStyle(color: mainTextColor, fontWeight: FontWeight.bold),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Tempelkan kode cadangan yang telah Anda salin sebelumnya untuk memulihkan seluruh data.',
-                style: TextStyle(color: subTextColor, fontSize: 12, height: 1.4),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: textController,
-                maxLines: 4,
-                decoration: InputDecoration(
-                  hintText: 'Tempelkan kode backup di sini...',
-                  hintStyle: const TextStyle(fontSize: 12),
-                  filled: true,
-                  fillColor: isDark
-                      ? Colors.white.withValues(alpha: 0.03)
-                      : Colors.black.withValues(alpha: 0.015),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                style: TextStyle(color: mainTextColor, fontSize: 12),
-              ),
-            ],
+          content: Text(
+            'Memulihkan data akan menggantikan seluruh data transaksi, dompet, anggaran, celengan, tagihan, dan data keuangan Anda saat ini dengan data dari file cadangan.\n\nApakah Anda ingin melanjutkan?',
+            style: TextStyle(color: subTextColor, fontSize: 13, height: 1.4),
           ),
           actions: [
             TextButton(
@@ -194,23 +172,42 @@ class SettingsScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () async {
-                final text = textController.text.trim();
-                if (text.isEmpty) return;
+                Navigator.of(context).pop(); // Close dialog first
+                try {
+                  final result = await FilePicker.platform.pickFiles(
+                    type: FileType.any,
+                  );
 
-                final success = await provider.restoreBackupData(text);
-                if (context.mounted) {
-                  Navigator.of(context).pop();
-                  if (success) {
+                  if (result != null && result.files.single.path != null) {
+                    final file = File(result.files.single.path!);
+                    final content = await file.readAsString();
+                    final success = await provider.restoreBackupData(content);
+
+                    if (context.mounted) {
+                      if (success) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Data berhasil dipulihkan!'),
+                            backgroundColor: Colors.teal,
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'File cadangan tidak valid atau rusak.',
+                            ),
+                            backgroundColor: Colors.redAccent,
+                          ),
+                        );
+                      }
+                    }
+                  }
+                } catch (e) {
+                  if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Data berhasil dipulihkan!'),
-                        backgroundColor: Colors.teal,
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Kode backup tidak valid atau rusak.'),
+                      SnackBar(
+                        content: Text('Gagal membaca file cadangan: $e'),
                         backgroundColor: Colors.redAccent,
                       ),
                     );
@@ -218,7 +215,7 @@ class SettingsScreen extends StatelessWidget {
                 }
               },
               child: const Text(
-                'Restore',
+                'Pilih File',
                 style: TextStyle(
                   color: Colors.teal,
                   fontWeight: FontWeight.bold,
@@ -456,13 +453,16 @@ class SettingsScreen extends StatelessWidget {
                             if (val) {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => const PinLockScreen(mode: PinMode.setup),
+                                  builder: (context) =>
+                                      const PinLockScreen(mode: PinMode.setup),
                                 ),
                               );
                             } else {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => const PinLockScreen(mode: PinMode.disable),
+                                  builder: (context) => const PinLockScreen(
+                                    mode: PinMode.disable,
+                                  ),
                                 ),
                               );
                             }
@@ -497,7 +497,8 @@ class SettingsScreen extends StatelessWidget {
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => const PinLockScreen(mode: PinMode.change),
+                                builder: (context) =>
+                                    const PinLockScreen(mode: PinMode.change),
                               ),
                             );
                           },
@@ -531,10 +532,22 @@ class SettingsScreen extends StatelessWidget {
                               fontSize: 13,
                             ),
                             items: const [
-                              DropdownMenuItem(value: 1, child: Text('1 Menit')),
-                              DropdownMenuItem(value: 5, child: Text('5 Menit')),
-                              DropdownMenuItem(value: 15, child: Text('15 Menit')),
-                              DropdownMenuItem(value: 30, child: Text('30 Menit')),
+                              DropdownMenuItem(
+                                value: 1,
+                                child: Text('1 Menit'),
+                              ),
+                              DropdownMenuItem(
+                                value: 5,
+                                child: Text('5 Menit'),
+                              ),
+                              DropdownMenuItem(
+                                value: 15,
+                                child: Text('15 Menit'),
+                              ),
+                              DropdownMenuItem(
+                                value: 30,
+                                child: Text('30 Menit'),
+                              ),
                               DropdownMenuItem(value: -1, child: Text('Never')),
                             ],
                             onChanged: (val) {
@@ -587,24 +600,37 @@ class SettingsScreen extends StatelessWidget {
                           ),
                         ),
                         subtitle: Text(
-                          'Ekspor dan salin seluruh data ke clipboard.',
+                          'Ekspor seluruh data keuangan Anda ke file JSON.',
                           style: TextStyle(color: subTextColor, fontSize: 11),
                         ),
                         trailing: Icon(
-                          Icons.content_copy_rounded,
+                          Icons.download_rounded,
                           color: subTextColor,
                           size: 18,
                         ),
                         onTap: () async {
-                          final backupStr = await provider.exportBackupData();
-                          await Clipboard.setData(ClipboardData(text: backupStr));
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Kode backup disalin ke clipboard!'),
-                                backgroundColor: Colors.teal,
-                              ),
+                          try {
+                            final backupStr = await provider.exportBackupData();
+                            final tempDir = await getTemporaryDirectory();
+                            final dateStr = DateTime.now().toString().split(
+                              ' ',
+                            )[0];
+                            final file = File(
+                              '${tempDir.path}/nioney_backup_$dateStr.json',
                             );
+                            await file.writeAsString(backupStr);
+                            await Share.shareXFiles([
+                              XFile(file.path),
+                            ], subject: 'Nioney Backup $dateStr');
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Gagal membuat backup: $e'),
+                                  backgroundColor: Colors.redAccent,
+                                ),
+                              );
+                            }
                           }
                         },
                       ),
@@ -624,11 +650,11 @@ class SettingsScreen extends StatelessWidget {
                           ),
                         ),
                         subtitle: Text(
-                          'Impor data keuangan Anda dari clipboard.',
+                          'Impor data keuangan Anda dari file JSON cadangan.',
                           style: TextStyle(color: subTextColor, fontSize: 11),
                         ),
                         trailing: Icon(
-                          Icons.restore_rounded,
+                          Icons.upload_file_rounded,
                           color: subTextColor,
                           size: 18,
                         ),
