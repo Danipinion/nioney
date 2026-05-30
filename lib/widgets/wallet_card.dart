@@ -178,7 +178,7 @@ class WalletCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.baseline,
                           textBaseline: TextBaseline.alphabetic,
                           children: [
-                            if (isNegative)
+                            if (isNegative && !AppLocale.hideAllNominal)
                               const Text(
                                 '-',
                                 style: TextStyle(
@@ -188,10 +188,7 @@ class WalletCard extends StatelessWidget {
                                 ),
                               ),
                             Text(
-                              numberFormat
-                                  .format(wallet.balance.abs())
-                                  .replaceAll(currencySymbol, '')
-                                  .trim(),
+                              AppLocale.formatCurrency(wallet.balance.abs(), ''),
                               style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,

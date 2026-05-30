@@ -190,7 +190,7 @@ class TransactionItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '$amountPrefix$currencySymbol ${numberFormat.format(transaction.amount)}',
+                  AppLocale.formatCurrency(transaction.amount, '$amountPrefix$currencySymbol '),
                   style: TextStyle(
                     color: amountColor,
                     fontWeight: FontWeight.w800,

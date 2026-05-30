@@ -5,6 +5,7 @@ import '../providers/app_provider.dart';
 import '../models/bill.dart';
 import '../models/category.dart';
 import '../models/wallet.dart';
+import '../main.dart';
 
 class BillsScreen extends StatefulWidget {
   const BillsScreen({super.key});
@@ -470,7 +471,7 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Anda akan membayar "${bill.title}" sebesar Rp ${NumberFormat.decimalPattern('id_ID').format(bill.amount)}',
+                    'Anda akan membayar "${bill.title}" sebesar ${AppLocale.formatCurrency(bill.amount, 'Rp ')}',
                     style: TextStyle(color: subColor, fontSize: 13),
                   ),
                   const SizedBox(height: 20),
@@ -501,7 +502,7 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
                                   Icon(w.icon, size: 16, color: w.color),
                                   const SizedBox(width: 8),
                                   Text(
-                                    '${w.name} (Rp ${NumberFormat.decimalPattern('id_ID').format(w.balance)})',
+                                    '${w.name} (${AppLocale.formatCurrency(w.balance, 'Rp ')})',
                                     style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.bold),
                                   ),
                                 ],
@@ -711,7 +712,7 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                '$currency ${formatter.format(totalUnpaid)}',
+                                AppLocale.formatCurrency(totalUnpaid, '$currency '),
                                 style: TextStyle(
                                   color: totalUnpaid > 0 ? Colors.redAccent : const Color(0xFF00D179),
                                   fontSize: 22,
@@ -1001,7 +1002,7 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          'Rp ${currencyFormat.format(bill.amount)}',
+                          AppLocale.formatCurrency(bill.amount, 'Rp '),
                           style: TextStyle(
                             color: bill.isPaid ? subTextColor : mainTextColor,
                             fontWeight: FontWeight.w900,

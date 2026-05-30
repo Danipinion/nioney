@@ -6,6 +6,7 @@ import '../models/wallet.dart';
 import 'savings_targets_screen.dart';
 import 'savings_target_detail_screen.dart';
 import 'wallet_detail_screen.dart';
+import '../main.dart';
 
 class WalletsScreen extends StatelessWidget {
   const WalletsScreen({super.key});
@@ -15,6 +16,18 @@ class WalletsScreen extends StatelessWidget {
       context,
       MaterialPageRoute(builder: (context) => const AddWalletScreen()),
     );
+  }
+
+  String formatVal(double value) {
+    if (AppLocale.hideAllNominal) {
+      return 'Rp***';
+    }
+    final formatter = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp',
+      decimalDigits: 2,
+    );
+    return formatter.format(value);
   }
 
   @override
@@ -39,11 +52,13 @@ class WalletsScreen extends StatelessWidget {
       0.0,
       (sum, t) => sum + t.savedAmount,
     );
+
     final formatter = NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp',
       decimalDigits: 2,
     );
+
 
     return Scaffold(
       backgroundColor: scaffoldBg,
@@ -143,7 +158,7 @@ class WalletsScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          formatter.format(totalBalance),
+                          formatVal(totalBalance),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 32,
@@ -200,14 +215,14 @@ class WalletsScreen extends StatelessWidget {
                             Expanded(
                               child: _buildMiniStatCard(
                                 'Saldo Bersih',
-                                formatter.format(totalBalance),
+                                formatVal(totalBalance),
                               ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: _buildMiniStatCard(
                                 'Hutang Aktif',
-                                formatter.format(0),
+                                formatVal(0),
                               ),
                             ),
                           ],
@@ -218,14 +233,14 @@ class WalletsScreen extends StatelessWidget {
                             Expanded(
                               child: _buildMiniStatCard(
                                 'Tabungan Aktif',
-                                formatter.format(totalSavings),
+                                formatVal(totalSavings),
                               ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: _buildMiniStatCard(
                                 'Pembayaran Mendatang',
-                                formatter.format(0),
+                                formatVal(0),
                               ),
                             ),
                           ],
@@ -501,7 +516,7 @@ class WalletsScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                formatter.format(wallet.balance),
+                                formatVal(wallet.balance),
                                 style: TextStyle(
                                   color: textColor,
                                   fontSize: 14,
@@ -775,7 +790,7 @@ class WalletsScreen extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'Terkumpul: ${formatter.format(target.savedAmount)} dari ${formatter.format(target.targetAmount)} (${(progress * 100).toStringAsFixed(0)}%)',
+                                  'Terkumpul: ${formatVal(target.savedAmount)} dari ${formatVal(target.targetAmount)} (${(progress * 100).toStringAsFixed(0)}%)',
                                   style: TextStyle(
                                     color: subTextColor,
                                     fontSize: 10,

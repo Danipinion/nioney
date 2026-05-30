@@ -10,6 +10,7 @@ import '../models/recurring_transaction.dart';
 import '../models/savings_target.dart';
 import '../models/bill.dart';
 import '../models/debt.dart';
+import '../main.dart';
 
 class AppProvider with ChangeNotifier, WidgetsBindingObserver {
   static const String _prefTransactionsKey = 'nioney_transactions';
@@ -40,6 +41,7 @@ class AppProvider with ChangeNotifier, WidgetsBindingObserver {
   ThemeMode _themeMode = ThemeMode.dark;
   String _currentPalette = 'Deep Sapphire';
   String _currencySymbol = 'Rp';
+  bool _hideAllNominal = false;
 
   // PIN settings fields
   String? _pinCode;
@@ -61,6 +63,7 @@ class AppProvider with ChangeNotifier, WidgetsBindingObserver {
   ThemeMode get themeMode => _themeMode;
   String get currentPalette => _currentPalette;
   String get currencySymbol => _currencySymbol;
+  bool get hideAllNominal => _hideAllNominal;
 
   // PIN settings getters
   String? get pinCode => _pinCode;
@@ -285,6 +288,8 @@ class AppProvider with ChangeNotifier, WidgetsBindingObserver {
     _pinCode = prefs.getString('nioney_pin_code');
     _isPinEnabled = prefs.getBool('nioney_pin_enabled') ?? false;
     _sessionTimeoutMinutes = prefs.getInt('nioney_session_timeout') ?? 15;
+    _hideAllNominal = prefs.getBool('nioney_hide_all_nominal') ?? false;
+    AppLocale.hideAllNominal = _hideAllNominal;
     if (_isPinEnabled && _pinCode != null && _pinCode!.isNotEmpty) {
       _isAppLocked = true;
     } else {
@@ -293,6 +298,14 @@ class AppProvider with ChangeNotifier, WidgetsBindingObserver {
 
     await checkAndProcessRecurringTransactions();
 
+    notifyListeners();
+  }
+
+  Future<void> toggleHideAllNominal() async {
+    _hideAllNominal = !_hideAllNominal;
+    AppLocale.hideAllNominal = _hideAllNominal;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('nioney_hide_all_nominal', _hideAllNominal);
     notifyListeners();
   }
 

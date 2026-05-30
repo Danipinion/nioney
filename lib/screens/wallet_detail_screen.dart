@@ -103,6 +103,13 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
       decimalDigits: 2,
     );
 
+    String formatVal(double value) {
+      if (AppLocale.hideAllNominal) {
+        return 'Rp***';
+      }
+      return formatter.format(value);
+    }
+
     // Filter transactions for this wallet
     final allWalletTxs = provider.transactions.where((tx) => tx.walletId == wallet.id).toList();
 
@@ -343,7 +350,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          formatter.format(wallet.balance),
+                          formatVal(wallet.balance),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 28,
@@ -464,7 +471,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          formatter.format(monthlyIn),
+                          formatVal(monthlyIn),
                           style: TextStyle(
                             color: textColor,
                             fontSize: 14,
@@ -504,7 +511,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          formatter.format(monthlyOut),
+                          formatVal(monthlyOut),
                           style: TextStyle(
                             color: textColor,
                             fontSize: 14,
@@ -638,7 +645,7 @@ class _WalletDetailScreenState extends State<WalletDetailScreen> {
                                     ],
                                   ),
                                   Text(
-                                    '${formatter.format(amt)} (${percent.toStringAsFixed(1)}%)',
+                                    '${formatVal(amt)} (${percent.toStringAsFixed(1)}%)',
                                     style: TextStyle(color: subTextColor, fontSize: 10, fontWeight: FontWeight.bold),
                                   ),
                                 ],

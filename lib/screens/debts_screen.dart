@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/app_provider.dart';
 import '../models/debt.dart';
+import '../main.dart';
 
 class DebtsScreen extends StatefulWidget {
   const DebtsScreen({super.key});
@@ -201,7 +202,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                                         Icon(w.icon, size: 16, color: w.color),
                                         const SizedBox(width: 8),
                                         Text(
-                                          '${w.name} (Rp ${NumberFormat.decimalPattern('id_ID').format(w.balance)})',
+                                          '${w.name} (${AppLocale.formatCurrency(w.balance, 'Rp ')})',
                                           style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.bold),
                                         ),
                                       ],
@@ -513,7 +514,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                                     Icon(w.icon, size: 16, color: w.color),
                                     const SizedBox(width: 8),
                                     Text(
-                                      '${w.name} (Rp ${NumberFormat.decimalPattern('id_ID').format(w.balance)})',
+                                      '${w.name} (${AppLocale.formatCurrency(w.balance, 'Rp ')})',
                                       style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.bold),
                                     ),
                                   ],
@@ -794,7 +795,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            '$currency ${formatter.format(totalRemaining)}',
+                            AppLocale.formatCurrency(totalRemaining, '$currency '),
                             style: TextStyle(
                               color: _showDebts ? const Color(0xFFFF7043) : const Color(0xFF42A5F5),
                               fontSize: 24,
@@ -974,7 +975,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Terbayar: Rp ${formatter.format(paid)} / Rp ${formatter.format(total)}',
+                                    'Terbayar: ${AppLocale.formatCurrency(paid, 'Rp ')} / ${AppLocale.formatCurrency(total, 'Rp ')}',
                                     style: TextStyle(
                                       color: mainTextColor,
                                       fontSize: 12,

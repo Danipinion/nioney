@@ -266,16 +266,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                               ),
                               const SizedBox(width: 6),
-                              Icon(
-                                Icons.visibility_rounded,
-                                color: Colors.white.withValues(alpha: 0.75),
-                                size: 14,
+                              GestureDetector(
+                                onTap: () => provider.toggleHideAllNominal(),
+                                child: Icon(
+                                  provider.hideAllNominal
+                                      ? Icons.visibility_off_rounded
+                                      : Icons.visibility_rounded,
+                                  color: Colors.white.withValues(alpha: 0.75),
+                                  size: 16,
+                                ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            numberFormat.format(provider.totalBalance),
+                            AppLocale.formatCurrency(provider.totalBalance, '$currency '),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 32,
@@ -330,7 +335,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       ),
                                       const SizedBox(height: 6),
                                       Text(
-                                        numberFormat.format(displayIncome),
+                                        AppLocale.formatCurrency(displayIncome, '$currency '),
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 14,
@@ -385,7 +390,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       ),
                                       const SizedBox(height: 6),
                                       Text(
-                                        numberFormat.format(displayExpense),
+                                        AppLocale.formatCurrency(displayExpense, '$currency '),
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 14,
@@ -703,7 +708,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         ],
                                       ),
                                       Text(
-                                        'Sisa ${numberFormat.format(remaining < 0 ? 0.0 : remaining)}',
+                                        'Sisa ${AppLocale.formatCurrency(remaining < 0 ? 0.0 : remaining, '$currency ')}',
                                         style: TextStyle(
                                           color: remaining < 0 ? const Color(0xFFEF5350) : const Color(0xFF00D179),
                                           fontSize: 12,
@@ -726,7 +731,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         ),
                                       ),
                                       Text(
-                                        '${numberFormat.format(totalSpent)} / ${numberFormat.format(totalLimit)}',
+                                        '${AppLocale.formatCurrency(totalSpent, '$currency ')} / ${AppLocale.formatCurrency(totalLimit, '$currency ')}',
                                         style: TextStyle(
                                           color: subTextColor,
                                           fontSize: 11,
@@ -1134,7 +1139,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               const SizedBox(height: 2),
               Text(
-                format.format(wallet.balance),
+                AppLocale.formatCurrency(wallet.balance, format.currencySymbol),
                 style: TextStyle(
                   color: mainTextColor,
                   fontSize: 14,
@@ -1221,7 +1226,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               const SizedBox(height: 2),
               Text(
-                format.format(target.savedAmount),
+                AppLocale.formatCurrency(target.savedAmount, format.currencySymbol),
                 style: TextStyle(
                   color: mainTextColor,
                   fontSize: 14,

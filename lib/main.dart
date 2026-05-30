@@ -10,9 +10,13 @@ import 'screens/pin_lock_screen.dart';
 
 class AppLocale {
   static bool isInitialized = false;
+  static bool hideAllNominal = false;
 
   // 100% safe, crash-free currency formatting that works everywhere (even in debug F5)
   static String formatCurrency(double amount, String symbol) {
+    if (hideAllNominal) {
+      return '$symbol***';
+    }
     try {
       final formatter = NumberFormat.currency(
         symbol: symbol,
